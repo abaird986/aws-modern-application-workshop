@@ -115,13 +115,13 @@ You can either visit the CloudFormation console to view the creation status of y
 aws cloudformation describe-stacks --stack-name MythicalMysfitsWebsiteBucket
 ```
 
-When you see the StackStatus of “CREATE_COMPLETE”, your S3 bucket has been created.  Find the “Outputs” object within the response to find the HTTPS URL that you can use to access your new website, save this for reference.  Also, within the URL you can find the name of the S3 bucket that has been created.  Save this for reference as well, the bolded section below represents the bucket name that can be found within the Output S3BucketSecureURL:
+When you see the StackStatus of “CREATE_COMPLETE”, your S3 bucket has been created.  Find the “Outputs” object within the response to find the HTTPS URL that you can use to access your new website, save this for reference.  Also, within the URL you can find the name of the S3 bucket that has been created.  Save this for reference as well, the section between the arrows below represents your bucket name that can be found within the Output S3BucketSecureURL:
 
 ```
 {
     "Description": "Name of S3 bucket to hold website content",
     "OutputKey": "S3BucketSecureURL",
-    "OutputValue": "https://mythicalmysfitswebsitebucket-s3bucket-xxxxx.amazonaws.com"
+    "OutputValue": "https://-->mythicalmysfitswebsitebucket-s3bucket-xxxxx<---.amazonaws.com"
 }
 ```
 
