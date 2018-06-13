@@ -121,7 +121,7 @@ When you see the StackStatus of “CREATE_COMPLETE”, your S3 bucket has been c
 {
     "Description": "Name of S3 bucket to hold website content",
     "OutputKey": "S3BucketSecureURL",
-    "OutputValue": "https://**mythicalmysfitswebsitebucket-s3bucket-xxxxx**.amazonaws.com"
+    "OutputValue": "https://mythicalmysfitswebsitebucket-s3bucket-xxxxx.amazonaws.com"
 }
 ```
 
@@ -129,7 +129,7 @@ When you see the StackStatus of “CREATE_COMPLETE”, your S3 bucket has been c
 Now we need to copy the first version of Mythical Mysfits homepage to the bucket.  This is included as an index.html file within the /module-1/web/ directory of the repository you cloned.  We will accomplish this using the AWS CLI using the following command, which will use the S3 bucket name that you save from above (the bolded component):
 
 ```
-aws s3 cp ./module-1/web/index.html s3://**mythicalmysfitswebsitebucket-s3bucket-xxxx**/index.html
+aws s3 cp ./module-1/web/index.html s3://mythicalmysfitswebsitebucket-s3bucket-xxxx/index.html
 ```
 
 Now, if you visit the full URL saved earlier, you can see that the initial Mythical Mysfits website is up and running!
@@ -207,13 +207,13 @@ You will see docker download and install all of the necessary dependency package
 
 ```
 Successfully built 8bxxxxxxxxab
-Successfully tagged **111111111111.dkr.ecr.us-east-1.amazonaws.com/mythicalmysfits/service:latest**
+Successfully tagged 111111111111.dkr.ecr.us-east-1.amazonaws.com/mythicalmysfits/service:latest
 ```
 
 Let's test our image locally within Cloud9 to make sure everything is operating as expected. Copy the image tag that resulted from the previous camm and run the following command to deploy the container “locally” (which is actually within your Cloud9 IDE inside AWS!):
 
 ```
-docker run -p 8080:8080 **111111111111.dkr.ecr.us-east-1.amazonaws.com/mythicalmysfits/service:latest**
+docker run -p 8080:8080 111111111111.dkr.ecr.us-east-1.amazonaws.com/mythicalmysfits/service:latest
 ```
 
 As a result you will see docker reporting that your container is up and running locally:
@@ -285,7 +285,7 @@ In the response JSON, you will see an Output listed called “ExternalUrl”, wh
   "Description": "The url of the external load balancer",
   "ExportName": "MythicalMysfitsCoreStack:ExternalUrl",
   "OutputKey": "ExternalUrl",
-  "OutputValue": "**http://Mythi-Publi-123456789-abc123456.elb.us-east-1.amazonaws.com**"
+  "OutputValue": "http://Mythi-Publi-123456789-abc123456.elb.us-east-1.amazonaws.com"
 }
 ```
 
