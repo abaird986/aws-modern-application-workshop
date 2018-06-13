@@ -20,7 +20,7 @@ AWS provides all the services and features required for a developer to create a 
 
 The site will present *mysfits* available for adoption with some different characteristics about each. Users will be able to vote on which mysfits are their favorites, and then choose to adopt the mysfit they'd like to reserve for adoption.  The Mythical Mysfits website you create will also allow you to gather insights about user behavior for future analyses.
 
-This sample application will use many different AWS services and features that modern applications leverage on AWS. But, learning about *what* those individual services and their features are is not the primary objective of this workshop.  Instead, this workshop is meant to give you an experience of *how* developers are able to use developer tools and services provided by AWS throughout the SDLC of their modern applications.
+This sample application will use many different AWS services and features that modern applications leverage on AWS. But, learning about *what* those individual services and their features are is not the primary objective of this workshop.  Instead, this workshop is meant to give you an experience of *how* developers are able to build modern applications by interacting with those features and services through the development tools that AWS provides.
 
 ### Application Architecture
 
