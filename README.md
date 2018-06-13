@@ -230,7 +230,7 @@ This will open another panel in the IDE where the web browser will be available.
 
 ![preview-menu](/images/module-2/address-bar.png)
 
-If successful you will see a response from the service that returns the JSON document stored at `/modern-application-workshop/module-2/app/service/mysfits-response.json`
+If successful you will see a response from the service that returns the JSON document stored at `/aws-modern-application-workshop/module-2/app/service/mysfits-response.json`
 
 With a successful test of our service locally, we're ready to create a container image repository in Amazon ECR and push our image into it.  In order to create the registry, run the following command, this creates a new repository in the default AWS ECR registry created for your account.
 
@@ -310,7 +310,7 @@ After pasting, the line should look similar to below:
 To upload this file to your S3 hosted website, use the bucket name again that was created during Module 1, and run the following command:
 
 ```
-aws s3 cp ~/environment/modern-application-workshop/module-2/web/index.html s3://INSERT-YOUR-BUCKET-NAME/index.html
+aws s3 cp ~/environment/aws-modern-application-workshop/module-2/web/index.html s3://INSERT-YOUR-BUCKET-NAME/index.html
 ```
 
  Open your website using the same URL used at the end of Module 1 in order to see your new Mythical Mysfits website, which is retrieving JSON data from your Flask API running within a docker container deployed to AWS Fargate!
@@ -376,7 +376,7 @@ git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/MythicalMysfit
 This will tell us that our repository is empty!  Let's fix that by copying the application files into our repository directory using the following command:
 
 ```
-cp -r ~/environment/modern-application-workshop/module-2/app/* ~/environment/MythicalMysfitsService-Repository/
+cp -r ~/environment/aws-modern-application-workshop/module-2/app/* ~/environment/MythicalMysfitsService-Repository/
 ```
 
 Now the completed service code that we used to create our Fargate service in Module 2 is stored in the local repository that we just cloned from AWS CodeCommit.  Let's make a change to the Flask service before committing our changes, to demonstrate that the CI/CD pipeline we've created is working. In Cloud9, open the file stored at `~/environment/MythicalMysfitsService-Repository/service/mysfits-response.json` and change the age of one of the mysfits to another value and save the file.
@@ -445,7 +445,7 @@ aws dynamodb scan --table-name MysfitsTable
 Also provided is a JSON file that can be used to batch insert a number of Mysfit items into this table.  This will be accomplished through the DynamoDB API **BatchWriteItem.** To call this API using the provided JSON file, execute the following terminal command (the response from the service should report that there are no items that went unprocessed):
 
 ```
-aws dynamodb batch-write-item --request-items file://~/environment/modern-application-workshop/lib/populate-dynamodb.json
+aws dynamodb batch-write-item --request-items file://~/environment/aws-modern-application-workshop/lib/populate-dynamodb.json
 ```
 
 Now, if you run the same command to scan all of the table contents, you'll find the items have been loaded into the table:
@@ -461,7 +461,7 @@ Now that we have our data included in the table, let's modify our application co
 The request is formed using the AWS Python SDK called **boto3**. This SDK is a powerful yet simple way to interact with AWS services via Python code. It enables you to use service client definitions and functions that have great symmetry with the AWS APIs and CLI commands you've already been executing as part of this workshop.  Translating those commands to working Python code is simple when using **boto3**.  To copy the new files into your CodeCommit repository directory, execute the following command in the terminal:
 
 ```
-cp ~/environment/modern-application-workshop/module-3/app/service/* ~/environment/MythicalMysfitsService-Repository/service/
+cp ~/environment/aws-modern-application-workshop/module-3/app/service/* ~/environment/MythicalMysfitsService-Repository/service/
 ```
 
 Now, we need to check in these code changes to CodeCommit using the git command line client.  Run the following commands to check in the new code changes and kick of your CI/CD pipeline:
@@ -486,10 +486,10 @@ Now, in just 5-10 minutes you'll see your code changes make it through your full
 
 ### Update The Website Content in S3
 
-Finally, we need to publish a new index.html page to our S3 bucket so that the new API functionality using query strings to filter responses will be used.  The new index.html file is located at ~/environment/modern-application-workshop/module-3/web/index.html.  Open this file in your Cloud9 IDE and replace the string indicating “REPLACE_ME” just as you did in Module 1, with the appropriate NLB endpoint.  Refer to the file you already edited in the /module-1/ directory if you need to.  After replacing the endpoint to point at your NLB, upload the new index.html file by running the following command (replacing with the name of the bucket you created in Module 1:
+Finally, we need to publish a new index.html page to our S3 bucket so that the new API functionality using query strings to filter responses will be used.  The new index.html file is located at `~/environment/aws-modern-application-workshop/module-3/web/index.html`.  Open this file in your Cloud9 IDE and replace the string indicating “REPLACE_ME” just as you did in Module 1, with the appropriate NLB endpoint.  Refer to the file you already edited in the /module-1/ directory if you need to.  After replacing the endpoint to point at your NLB, upload the new index.html file by running the following command (replacing with the name of the bucket you created in Module 1:
 
 ```
-aws s3 cp --recursive ~/environment/modern-application-workshop/module-3/web/ s3://your_bucket_name_here/
+aws s3 cp --recursive ~/environment/aws-modern-application-workshop/module-3/web/ s3://your_bucket_name_here/
 ```
 
 Re-visit your Mythical Mysfits website to see the new population of Mysfits loading from your DynamoDB table and how the Filter functionality is working!
@@ -529,7 +529,7 @@ In order to push this update out to the service stack in CloudFormation, we'll u
 This command will take the SAM template that we have created and transform it into typical CloudFormation, generate the **change set** to be applied to our stack (indicating which resources in the stack will be created, modified or deleted), then subsequently execute the changes to the stack using the same update-stack command we used in the last module.  To add the Cogntio User Pool and API Gateway API to our service stack run the following command in your terminal:
 
 ```
-aws cloudformation deploy --stack-name MythicalMysfitsServiceStack --template-file ~/environment/modern-application-workshop/module-4/cfn/service-with-apigw.yml
+aws cloudformation deploy --stack-name MythicalMysfitsServiceStack --template-file ~/environment/aws-modern-application-workshop/module-4/cfn/service-with-apigw.yml
 ```
 
 Once the stack has updated, run the following command to show the Output of the CloudFormation stack.  This latest version includes an Output of the REST API endpoint for your newly deployed API, as swell as additional outputs related to the Cognito UserPool and Cognito Client that have been created:
@@ -552,7 +552,7 @@ Copy the OutputValue listed for the OutputKeys of ApiEndpoint, UserPoolId, and U
 
 ### Editing and Publishing the Website
 
-Open the new version of the Mythical Mysfits index.html file we will push to S3 shortly, it is located at: `~/environment/modern-application-workshop/module-4/app/web/index.html`
+Open the new version of the Mythical Mysfits index.html file we will push to S3 shortly, it is located at: `~/environment/aws-modern-application-workshop/module-4/app/web/index.html`
 In this new index.html file, you'll notice additional HTML and JavaScript code that is being used to add a user registration and login experience.  This code is interacting with the AWS Cognito JavaScript SDK to help manage registration, authentication, and authorization to all of the API calls that require it.
 
 In this file, replace the strings 'REPLACE_ME' inside the single quotes with the endpoint OutputValues you copied from above and save the file:
@@ -562,7 +562,7 @@ In this file, replace the strings 'REPLACE_ME' inside the single quotes with the
 Now, lets copy this file, as well as the Cognito JavaScript SDK to the S3 bucket hosting our Mythical Mysfits website content so that the new features will be published online.
 
 ```
-aws s3 cp --recursive ~/environment/modern-application-workshop/module-4/web/ s3://YOUR-S3-BUCKET/
+aws s3 cp --recursive ~/environment/aws-modern-application-workshop/module-4/web/ s3://YOUR-S3-BUCKET/
 ```
 
 Refresh the Mythical Mysfits website in your browser to see the new functionality in action!
