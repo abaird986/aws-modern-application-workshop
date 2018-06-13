@@ -72,7 +72,7 @@ Leave the Environment settings as their defaults and click **Next Step**:
 ![cloud9-configure](/images/module-1/cloud9-configure-env.png)
 
 
-Click “Create Environment”:
+Click **Create Environment**:
 ![cloud9-review](/images/module-1/cloud9-review.png)
 
 
