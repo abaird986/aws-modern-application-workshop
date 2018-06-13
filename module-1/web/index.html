@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Mythical Mysfits</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+  </head>
+  <body ng-app="mysfitsApp">
+    <br>
+    <div class="container">
+      <div class='page-header'>
+        <h2 align="center">Mythical Mysfits</h2>
+        <br>
+      </div>
+    </div>
+    <br>
+    <div class="container">
+      <div id="mysfitsGrid" class="row" ng-controller="mysfitsListController">
+          <div class="col-md-4 border border-warning" ng-repeat="mysfit in mysfits">
+              <br>
+              <p align="center">
+                <strong> {{mysfit.name}}</strong>
+                <br>
+                <img src="{{mysfit.thumbImageUri}}" alt="{{mysfit.Name}}">
+              </p>
+              <p>
+                <br>
+                Species: {{mysfit.species}}
+                <br>
+                Age: {{mysfit.age}}
+                <br>
+                Alignment: {{mysfit.alignment}}
+                <br>
+                description: {{mysfit.description}}
+              </p>
+          </div>
+        </div>
+      </div>
+  </body>
+  <script>
+
+    var app = angular.module('mysfitsApp', []);
+
+    var gridScope;
+
+    app.controller('mysfitsListController', function($scope) {
+
+      $scope.mysfits =
+        [
+          {
+            "thumbImageUri": "https://images-na.ssl-images-amazon.com/images/G/01/00/00/04/62/36/87/462368790.gif",
+            "description": "xxxx",
+            "age": 100,
+            "profileImageUri": "https://i.imgur.com/qZDB4i6.jpg",
+            "name": "xxxx",
+            "species": "Dragon",
+            "alignment": "Evil",
+            "mysfitId": "2342342"
+          },
+          {
+            "thumbImageUri": "https://images-na.ssl-images-amazon.com/images/G/01/00/00/04/62/36/87/462368790.gif",
+            "description": "xxxx",
+            "age": 100,
+            "profileImageUri": "https://i.imgur.com/qZDB4i6.jpg",
+            "name": "xxxx",
+            "species": "Griffin",
+            "alignment": "Good",
+            "mysfitId": "gsgdsfsdfs"
+          },
+          {
+            "thumbImageUri": "https://images-na.ssl-images-amazon.com/images/G/01/00/00/04/62/36/87/462368790.gif",
+            "description": "123213 fkldsfs fsdfsd sfs dfsd fs dfs  sdff sd fsd f sdf sdfs",
+            "age": 99,
+            "profileImageUri": "https://i.imgur.com/qZDB4i6.jpg",
+            "name": "Drago",
+            "species": "Dragon",
+            "alignment": "Evil",
+            "mysfitId": "111-111-111-111"
+          },
+          {
+            "thumbImageUri": "https://images-na.ssl-images-amazon.com/images/G/01/00/00/04/62/36/87/462368790.gif",
+            "description": "xxxx",
+            "age": 100,
+            "profileImageUri": "https://i.imgur.com/qZDB4i6.jpg",
+            "name": "xxxx",
+            "species": "Griffin",
+            "alignment": "Good",
+            "mysfitId": "hdgfgfsfs"
+          },
+          {
+            "thumbImageUri": "https://images-na.ssl-images-amazon.com/images/G/01/00/00/04/62/36/87/462368790.gif",
+            "description": "xxxx",
+            "age": 100,
+            "profileImageUri": "https://i.imgur.com/qZDB4i6.jpg",
+            "name": "xxxx",
+            "species": "Direwolf",
+            "alignment": "Indifferent",
+            "mysfitId": "fdgdgfwefw"
+          },
+          {
+            "thumbImageUri": "https://images-na.ssl-images-amazon.com/images/G/01/00/00/04/62/36/87/462368790.gif",
+            "description": "xxxx",
+            "age": 100,
+            "profileImageUri": "https://i.imgur.com/qZDB4i6.jpg",
+            "name": "xxxx",
+            "species": "Griffin",
+            "alignment": "Evil",
+            "mysfitId": "bfdgsfefs"
+          },
+          {
+            "thumbImageUri": "https://images-na.ssl-images-amazon.com/images/G/01/00/00/04/62/36/87/462368790.gif",
+            "description": "xxxx",
+            "age": 100,
+            "profileImageUri": "https://i.imgur.com/qZDB4i6.jpg",
+            "name": "xxxx",
+            "species": "Dragon",
+            "alignment": "Evil",
+            "mysfitId": "sdfsdfsdfsdfs"
+          },
+          {
+            "thumbImageUri": "https://images-na.ssl-images-amazon.com/images/G/01/00/00/04/62/36/87/462368790.gif",
+            "description": "xxxx",
+            "age": 100,
+            "profileImageUri": "https://i.imgur.com/qZDB4i6.jpg",
+            "name": "xxxx",
+            "species": "Direwolf",
+            "alignment": "Evil",
+            "mysfitId": "cbvbcvbd"
+          },
+          {
+            "thumbImageUri": "https://images-na.ssl-images-amazon.com/images/G/01/00/00/04/62/36/87/462368790.gif",
+            "description": "xxxx",
+            "age": 100,
+            "profileImageUri": "https://i.imgur.com/qZDB4i6.jpg",
+            "name": "xxxx",
+            "species": "Griffin",
+            "alignment": "Evil",
+            "mysfitId": "twwerwe"
+          }
+        ]
+    });
+
+
+  </script>
+</html>

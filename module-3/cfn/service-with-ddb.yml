@@ -1,0 +1,206 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy a service on AWS Fargate, hosted in a private subnet, but accessible via a public load balancer.
+Parameters:
+  CoreStackName:
+    Type: String
+    Default: MythicalMysfitsCoreStack
+    Description: The name of the parent Fargate networking stack that you created. Necessary
+                 to locate and reference resources created by that stack.
+  ContainerCpu:
+    Type: Number
+    Default: 256
+    Description: How much CPU to give the container. 1024 is 1 CPU
+  ContainerMemory:
+    Type: Number
+    Default: 512
+    Description: How much memory in megabytes to give the container
+  ContainerPort:
+    Type: Number
+    Default: 8080
+    Description: Port the container service will be listening on.
+  Priority:
+    Type: Number
+    Default: 1
+    Description: The priority for the routing rule added to the load balancer.
+                 This only applies if your have multiple services which have been
+                 assigned to different paths on the load balancer.
+  DesiredCount:
+    Type: Number
+    Default: 2
+    Description: How many copies of the service task to run
+
+Resources:
+
+  # ECS Resources
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: MythicalMysfits-Cluster
+
+  MythicalMysfitsLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: mythicalmysfits-logs
+      RetentionInDays: 14
+
+  # The task definition. This is a simple metadata description of what
+  # container to run, and what resource requirements it has.
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: mythiaclmysfitsservice
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'CoreStackName', 'EcsServiceRole']]
+      TaskRoleArn:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'CoreStackName', 'ECSTaskRole']]
+      ContainerDefinitions:
+        - Name: MythicalMysfits-Service
+          Image:
+            Fn::Sub: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/mythicalmysfits/service:latest
+          PortMappings:
+            - ContainerPort: !Ref 'ContainerPort'
+              Protocol: http
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: mythicalmysfits-logs
+              awslogs-region:
+                Ref: AWS::Region
+              awslogs-stream-prefix: awslogs-mythicalmysfits-service
+          Essential: True
+
+  # The service. The service is a resource which allows you to run multiple
+  # copies of a type of task, and gather up their logs and metrics, as well
+  # as monitor the number of running tasks and replace any that have crashed
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn: PublicLoadBalancerListener
+    Properties:
+      ServiceName: MythicalMysfits-Service
+      Cluster: !Ref 'EcsCluster'
+      LaunchType: FARGATE
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      DesiredCount: !Ref 'DesiredCount'
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue:
+                !Join [':', [!Ref 'CoreStackName', 'FargateContainerSecurityGroup']]
+          Subnets:
+            - Fn::ImportValue:
+                !Join [':', [!Ref 'CoreStackName', 'PrivateSubnetOne']]
+            - Fn::ImportValue:
+                !Join [':', [!Ref 'CoreStackName', 'PrivateSubnetTwo']]
+      TaskDefinition: !Ref 'TaskDefinition'
+      LoadBalancers:
+        - ContainerName: MythicalMysfits-Service
+          ContainerPort: !Ref 'ContainerPort'
+          TargetGroupArn: !Ref 'TargetGroup'
+
+  # A target group. This is used for keeping track of all the tasks, and
+  # what IP addresses / port numbers they have. You can query it yourself,
+  # to use the addresses yourself, but most often this target group is just
+  # connected to an application load balancer, or network load balancer, so
+  # it can automatically distribute traffic across all the targets.
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthyThresholdCount: 3
+      TargetType: ip
+      Name: MythicalMysfits-Service
+      Port: !Ref ContainerPort
+      Protocol: TCP
+      UnhealthyThresholdCount: 3
+      VpcId:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'CoreStackName', 'VPCId']]
+
+  PublicLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref 'TargetGroup'
+          Type: 'forward'
+      LoadBalancerArn:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'CoreStackName', 'PublicLoadBalancer']]
+      Port: 80
+      Protocol: TCP
+
+  MysfitsTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "MysfitsTable"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      AttributeDefinitions:
+        -
+          AttributeName: "MysfitId"
+          AttributeType: "S"
+        -
+          AttributeName: "Alignment"
+          AttributeType: "S"
+        -
+          AttributeName: "Species"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "MysfitId"
+          KeyType: "HASH"
+      GlobalSecondaryIndexes:
+        -
+          IndexName: "SpeciesIndex"
+          KeySchema:
+            -
+              AttributeName: "Species"
+              KeyType: "HASH"
+            -
+              AttributeName: "MysfitId"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+        -
+          IndexName: "AlignmentIndex"
+          KeySchema:
+            -
+              AttributeName: "Alignment"
+              KeyType: "HASH"
+            -
+              AttributeName: "MysfitId"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+
+
+Outputs:
+  ClusterName:
+    Description: The name of the ECS cluster
+    Value: !Ref 'EcsCluster'
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ClusterName' ] ]
+
+  ServiceName:
+    Description: The name of the ECS cluster
+    Value: !Ref 'Service'
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ServiceName' ] ]

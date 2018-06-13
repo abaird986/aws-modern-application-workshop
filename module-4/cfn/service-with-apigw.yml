@@ -1,0 +1,397 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Deploy a service on AWS Fargate, hosted in a private subnet, but accessible via a public load balancer.
+Parameters:
+  CoreStackName:
+    Type: String
+    Default: MythicalMysfitsCoreStack
+    Description: The name of the parent Fargate networking stack that you created. Necessary
+                 to locate and reference resources created by that stack.
+  ContainerCpu:
+    Type: Number
+    Default: 256
+    Description: How much CPU to give the container. 1024 is 1 CPU
+  ContainerMemory:
+    Type: Number
+    Default: 512
+    Description: How much memory in megabytes to give the container
+  ContainerPort:
+    Type: Number
+    Default: 8080
+    Description: Port the container service will be listening on.
+  Priority:
+    Type: Number
+    Default: 1
+    Description: The priority for the routing rule added to the load balancer.
+                 This only applies if your have multiple services which have been
+                 assigned to different paths on the load balancer.
+  DesiredCount:
+    Type: Number
+    Default: 2
+    Description: How many copies of the service task to run
+
+Resources:
+
+  # ECS Resources
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: MythicalMysfits-Cluster
+
+  MythicalMysfitsLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: mythicalmysfits-logs
+      RetentionInDays: 14
+
+  # The task definition. This is a simple metadata description of what
+  # container to run, and what resource requirements it has.
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: mythiaclmysfitsservice
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'CoreStackName', 'EcsServiceRole']]
+      TaskRoleArn:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'CoreStackName', 'ECSTaskRole']]
+      ContainerDefinitions:
+        - Name: MythicalMysfits-Service
+          Image:
+            Fn::Sub: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/mythicalmysfits/service:latest
+          PortMappings:
+            - ContainerPort: !Ref 'ContainerPort'
+              Protocol: http
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: mythicalmysfits-logs
+              awslogs-region:
+                Ref: AWS::Region
+              awslogs-stream-prefix: awslogs-mythicalmysfits-service
+          Essential: True
+
+  # The service. The service is a resource which allows you to run multiple
+  # copies of a type of task, and gather up their logs and metrics, as well
+  # as monitor the number of running tasks and replace any that have crashed
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn: PublicLoadBalancerListener
+    Properties:
+      ServiceName: MythicalMysfits-Service
+      Cluster: !Ref 'EcsCluster'
+      LaunchType: FARGATE
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      DesiredCount: !Ref 'DesiredCount'
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue:
+                !Join [':', [!Ref 'CoreStackName', 'FargateContainerSecurityGroup']]
+          Subnets:
+            - Fn::ImportValue:
+                !Join [':', [!Ref 'CoreStackName', 'PrivateSubnetOne']]
+            - Fn::ImportValue:
+                !Join [':', [!Ref 'CoreStackName', 'PrivateSubnetTwo']]
+      TaskDefinition: !Ref 'TaskDefinition'
+      LoadBalancers:
+        - ContainerName: MythicalMysfits-Service
+          ContainerPort: !Ref 'ContainerPort'
+          TargetGroupArn: !Ref 'TargetGroup'
+
+  # A target group. This is used for keeping track of all the tasks, and
+  # what IP addresses / port numbers they have. You can query it yourself,
+  # to use the addresses yourself, but most often this target group is just
+  # connected to an application load balancer, or network load balancer, so
+  # it can automatically distribute traffic across all the targets.
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthyThresholdCount: 3
+      TargetType: ip
+      Name: MythicalMysfits-Service
+      Port: !Ref ContainerPort
+      Protocol: TCP
+      UnhealthyThresholdCount: 3
+      VpcId:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'CoreStackName', 'VPCId']]
+
+  PublicLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref 'TargetGroup'
+          Type: 'forward'
+      LoadBalancerArn:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'CoreStackName', 'PublicLoadBalancer']]
+      Port: 80
+      Protocol: TCP
+
+  MysfitsTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "MysfitsTable"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      AttributeDefinitions:
+        -
+          AttributeName: "MysfitId"
+          AttributeType: "S"
+        -
+          AttributeName: "Alignment"
+          AttributeType: "S"
+        -
+          AttributeName: "Species"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "MysfitId"
+          KeyType: "HASH"
+      GlobalSecondaryIndexes:
+        -
+          IndexName: "SpeciesIndex"
+          KeySchema:
+            -
+              AttributeName: "Species"
+              KeyType: "HASH"
+            -
+              AttributeName: "MysfitId"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+        -
+          IndexName: "AlignmentIndex"
+          KeySchema:
+            -
+              AttributeName: "Alignment"
+              KeyType: "HASH"
+            -
+              AttributeName: "MysfitId"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+
+  MysfitsUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MysfitsUserPool
+      AutoVerifiedAttributes:
+        - email
+
+  MysfitsUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+        UserPoolId: !Ref MysfitsUserPool
+
+  MysfitsVpcLink:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: MysfitsVpcLink
+      TargetArns:
+        -
+          Fn::ImportValue:
+            !Join [':', [!Ref 'CoreStackName', 'PublicLoadBalancer']]
+
+  MysfitsApigwApi:
+    Type: AWS::Serverless::Api
+    DependsOn:
+      - MysfitsVpcLink
+      - MysfitsUserPool
+    Properties:
+      EndpointConfiguration: REGIONAL
+      StageName: prod
+      Cors:
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Authorization'"
+      DefinitionBody:
+          swagger: 2.0
+          info:
+            title:
+              Ref: AWS::StackName
+          securityDefinitions:
+            MysfitsUserPoolAuthorizer:
+              type: apiKey
+              name: Authorization
+              in: header
+              x-amazon-apigateway-authtype: cognito_user_pools
+              x-amazon-apigateway-authorizer:
+                type: COGNITO_USER_POOLS
+                providerARNs:
+                  - !GetAtt MysfitsUserPool.Arn
+          paths:
+            "/":
+              get:
+                responses: {}
+                x-amazon-apigateway-integration:
+                  connectionType: VPC_LINK
+                  connectionId: !Ref MysfitsVpcLink
+                  httpMethod: GET
+                  type: HTTP_PROXY
+                  uri:
+                    !Join
+                      - ''
+                      - - Fn::ImportValue:
+                            !Join
+                              - ''
+                              -
+                                - !Ref 'CoreStackName'
+                                - ':'
+                                - 'ExternalUrl'
+                        - '/'
+            "/mysfits":
+              get:
+                responses: {}
+                x-amazon-apigateway-integration:
+                  connectionType: VPC_LINK
+                  connectionId: !Ref MysfitsVpcLink
+                  httpMethod: GET
+                  type: HTTP_PROXY
+                  uri:
+                    !Join
+                      - ''
+                      - - Fn::ImportValue:
+                            !Join
+                              - ''
+                              -
+                                - !Ref 'CoreStackName'
+                                - ':'
+                                - 'ExternalUrl'
+                        - '/mysfits'
+            "/mysfits/{mysfitId}":
+              get:
+                parameters:
+                  -
+                    name: mysfitId
+                    in: path
+                    required: true
+                    type: string
+                responses: {}
+                x-amazon-apigateway-integration:
+                  requestParameters:
+                    integration.request.path.mysfitId: method.request.path.mysfitId
+                  connectionType: VPC_LINK
+                  connectionId: !Ref MysfitsVpcLink
+                  httpMethod: GET
+                  type: HTTP_PROXY
+                  uri:
+                    !Join
+                      - ''
+                      - - Fn::ImportValue:
+                            !Join
+                              - ''
+                              -
+                                - !Ref 'CoreStackName'
+                                - ':'
+                                - 'ExternalUrl'
+                        - '/mysfits/{mysfitId}'
+            "/mysfits/{mysfitId}/adopt":
+              post:
+                parameters:
+                  -
+                    name: mysfitId
+                    in: path
+                    required: true
+                    type: string
+                responses: {}
+                security:
+                  -
+                    MysfitsUserPoolAuthorizer: []
+                x-amazon-apigateway-integration:
+                  requestParameters:
+                    integration.request.path.mysfitId: method.request.path.mysfitId
+                  connectionType: VPC_LINK
+                  connectionId: !Ref MysfitsVpcLink
+                  httpMethod: POST
+                  type: HTTP_PROXY
+                  uri:
+                    !Join
+                      - ''
+                      - - Fn::ImportValue:
+                            !Join
+                              - ''
+                              -
+                                - !Ref 'CoreStackName'
+                                - ':'
+                                - 'ExternalUrl'
+                        - '/mysfits/{mysfitId}/adopt'
+            "/mysfits/{mysfitId}/like":
+              post:
+                parameters:
+                  -
+                    name: mysfitId
+                    in: path
+                    required: true
+                    type: string
+                security:
+                  -
+                    MysfitsUserPoolAuthorizer: []
+                x-amazon-apigateway-integration:
+                  requestParameters:
+                    integration.request.path.mysfitId: method.request.path.mysfitId
+
+                  connectionType: VPC_LINK
+                  connectionId: !Ref MysfitsVpcLink
+                  httpMethod: POST
+                  security:
+                    -
+                      MysfitsUserPoolAuthorizer: []
+                  type: HTTP_PROXY
+                  uri:
+                    !Join
+                      - ''
+                      - - Fn::ImportValue:
+                            !Join
+                              - ''
+                              -
+                                - !Ref 'CoreStackName'
+                                - ':'
+                                - 'ExternalUrl'
+                        - '/mysfits/{mysfitId}/like'
+
+
+Outputs:
+  ClusterName:
+    Description: The name of the ECS cluster
+    Value: !Ref 'EcsCluster'
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ClusterName' ] ]
+
+  ServiceName:
+    Description: The name of the ECS cluster
+    Value: !Ref 'Service'
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ServiceName' ] ]
+
+  ApiEndpoint:
+    Description: The endpoint for the REST API created with API Gateway
+    Value: !Join ['', ['https://', !Ref 'MysfitsApigwApi',  '.execute-api.', !Ref 'AWS::Region', '.amazonaws.com/prod']]
+
+  UserPoolId:
+    Description: The Cognito user pool created for Mythical Mysfits users.
+    Value: !Ref 'MysfitsUserPool'
+
+  UserPoolClientId:
+    Description: The clientId for the application client that will utilize the Mysfits user pool.
+    Value: !Ref 'MysfitsUserPoolClient'

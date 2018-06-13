@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Mythical Mysfits</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+  </head>
+  <body ng-app="mysfitsApp">
+    <br>
+    <div class="container">
+      <div class='page-header'>
+        <h2 align="center">Mythical Mysfits</h2>
+        <br>
+      </div>
+    </div>
+    <div class="container" ng-controller="mysfitsFilterController">
+      <div id="filterMenu">
+        <ul class="nav nav-pills">
+          &nbsp;
+          <li class="nav-item dropdown" ng-repeat="filterCategory in filterOptionsList.categories">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#!" role="button" aria-haspopup="true" aria-expanded="false">{{filterCategory.title}}</a>
+            <div class="dropdown-menu" >
+              <button class="dropdown-item" ng-repeat="filterCategorySelection in filterCategory.selections" ng-click="queryMysfits(filterCategory.title, filterCategorySelection)">{{filterCategorySelection}}</button>
+            </div>
+          </li>
+          &nbsp;
+          <li class="nav-item " >
+            <button type="button" class="btn btn-success" ng-click="removeFilter()">View All</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <br>
+    <div class="container">
+      <div id="mysfitsGrid" class="row" ng-controller="mysfitsListController">
+          <div class="col-md-4 border border-warning" ng-repeat="mysfit in mysfits">
+              <br>
+              <p align="center">
+                <strong> {{mysfit.name}}</strong>
+                <br>
+                <img src="{{mysfit.thumbImageUri}}" alt="{{mysfit.Name}}">
+              </p>
+              <p>
+                <br>
+                Species: {{mysfit.species}}
+                <br>
+                Age: {{mysfit.age}}
+                <br>
+                Alignment: {{mysfit.alignment}}
+                <br>
+                description: {{mysfit.description}}
+              </p>
+          </div>
+        </div>
+      </div>
+  </body>
+  <script>
+
+    var mysfitsApiEndpoint = 'REPLACE_ME';
+
+    var app = angular.module('mysfitsApp', []);
+
+    var gridScope;
+
+    var filterScope;
+
+    app.controller('clearFilterController', function($scope) {
+    });
+
+    app.controller('mysfitsFilterController', function($scope) {
+
+      filterScope = $scope;
+
+      $scope.filterOptionsList =
+       {
+         "categories": [
+           {
+             "title": "Species",
+             "selections":  [
+               "Dragon",
+               "Griffin",
+               "Direwolf"
+             ]
+           },
+           {
+             "title": "Alignment",
+             "selections":  [
+               "Good",
+               "Evil",
+               "Indifferent"
+             ]
+           }
+         ]
+       };
+
+       $scope.removeFilter = function() {
+         allMysfits = getAllMysfits(applyGridScope);
+       }
+
+       $scope.queryMysfits = function(filterCategory, filterValue) {
+
+           var petsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategory + "&value=" + filterValue;
+
+           $.ajax({
+             url : petsApi,
+             type : 'GET',
+             success : function(response) {
+               applyGridScope(response.mysfits)
+             },
+             error : function(response) {
+               console.log("could not retrieve mysfits list.");
+             }
+           });
+       }
+
+
+
+    });
+
+    app.controller('mysfitsListController', function($scope) {
+
+      gridScope = $scope;
+
+      getAllMysfits(applyGridScope);
+
+    });
+
+    function applyGridScope(mysfitsList) {
+      gridScope.mysfits = mysfitsList;
+      gridScope.$apply();
+    }
+
+    function getAllMysfits(callback) {
+
+      var petsApi = mysfitsApiEndpoint + '/mysfits';
+
+      $.ajax({
+        url : petsApi,
+        type : 'GET',
+        success : function(response) {
+          callback(response.mysfits);
+        },
+        error : function(response) {
+          console.log("could not retrieve mysfits list.");
+        }
+      });
+    }
+
+
+  </script>
+</html>

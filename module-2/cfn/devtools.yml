@@ -1,0 +1,280 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create the resources required for a CI/CD pipeline to deploy checked-in code changes to a Fargate service.
+
+Parameters:
+  ServiceStackName:
+    Type: String
+    Default: MythicalMysfitsServiceStack
+    Description: The name of the parent Fargate Service Stack that you created. Necessary to located
+                 and reference resources created by that stack.
+
+Resources:
+
+  MythicalMysfitsServiceArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+        - ""
+        - - "mythicalmysfits-serviceartifacts"
+          - "-"
+          - Ref: AWS::Region
+          - "-"
+          - Ref: AWS::AccountId
+
+  S3BucketPolicy:
+    DependsOn:
+    - "MythicalMysfitsServiceArtifactsBucket"
+    - "MythicalMysfitsServiceCodeBuildServiceRole"
+    - "MythicalMysfitsServiceCodePipelineServiceRole"
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket:
+        Ref: "MythicalMysfitsServiceArtifactsBucket"
+      PolicyDocument:
+        Statement:
+        - Sid: WhitelistedGet
+          Effect: Allow
+          Principal:
+            AWS:
+            - Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/MythicalMysfitsServiceCodePipelineServiceRole"
+            - Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/MythicalMysfitsServiceCodeBuildServiceRole"
+          Action:
+          - "s3:GetObject"
+          - "s3:GetObjectVersion"
+          - "s3:GetBucketVersioning"
+          Resource:
+          - Fn::Sub: "arn:aws:s3:::mythicalmysfits-serviceartifacts-${AWS::Region}-${AWS::AccountId}/*"
+          - Fn::Sub: "arn:aws:s3:::mythicalmysfits-serviceartifacts-${AWS::Region}-${AWS::AccountId}"
+        - Sid: WhitelistedPut
+          Effect: Allow
+          Principal:
+            AWS:
+            - Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/MythicalMysfitsServiceCodePipelineServiceRole"
+            - Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/MythicalMysfitsServiceCodeBuildServiceRole"
+          Action: "s3:PutObject"
+          Resource:
+          - Fn::Sub: "arn:aws:s3:::mythicalmysfits-serviceartifacts-${AWS::Region}-${AWS::AccountId}/*"
+          - Fn::Sub: "arn:aws:s3:::mythicalmysfits-serviceartifacts-${AWS::Region}-${AWS::AccountId}"
+
+
+  MythicalMysfitsServiceRepository:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryName: MythicalMysfitsService-Repository
+      RepositoryDescription: Code required to create the MythicalMysfits website and backend service.
+
+  MythicalMysfitsServiceCodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: MythicalMysfitsServiceCodeBuildServiceRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: "MythicalMysfitsService-CodeBuildServicePolicy"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+            - "codecommit:ListBranches"
+            - "codecommit:ListRepositories"
+            - "codecommit:BatchGetRepositories"
+            - "codecommit:Get*"
+            - "codecommit:GitPull"
+            Resource:
+            - Fn::Sub: arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:MythicalMysfitsServiceRepository
+          - Effect: "Allow"
+            Action:
+            - "logs:CreateLogGroup"
+            - "logs:CreateLogStream"
+            - "logs:PutLogEvents"
+            Resource: "*"
+          - Effect: "Allow"
+            Action:
+            - "s3:PutObject"
+            - "s3:GetObject"
+            - "s3:GetObjectVersion"
+            - "s3:ListBucket"
+            Resource: "*"
+          - Effect: "Allow"
+            Action:
+            - "ecr:InitiateLayerUpload"
+            - "ecr:GetAuthorizationToken"
+            Resource: "*"
+
+  MythicalMysfitsServiceCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    DependsOn: MythicalMysfitsServiceCodeBuildServiceRole
+    Properties:
+      Artifacts:
+        Type: no_artifacts
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/python:3.5.2
+        PrivilegedMode: True
+        EnvironmentVariables:
+          - Name: AWS_ACCOUNT_ID
+            Value:
+              Ref: AWS::AccountId
+          - Name: AWS_DEFAULT_REGION
+            Value:
+              Ref: AWS::Region
+        Type: LINUX_CONTAINER
+      Name: MythicalMysfitsServiceCodeBuildProject
+      ServiceRole: !Ref MythicalMysfitsServiceCodeBuildServiceRole
+      Source:
+        Type: CODECOMMIT
+        Location:
+          Fn::Join:
+          - ""
+          - - ""
+            - "https://git-codecommit."
+            - Ref: AWS::Region
+            - ".amazonaws.com/v1/repos/MythicalMysfitsServiceRepository"
+
+  MythicalMysfitsServiceCodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: MythicalMysfitsServiceCodePipelineServiceRole
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codepipeline.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: MythicalMysfitsService-codepipeline-service-policy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - codecommit:GetBranch
+            - codecommit:GetCommit
+            - codecommit:UploadArchive
+            - codecommit:GetUploadArchiveStatus
+            - codecommit:CancelUploadArchive
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - s3:GetObject
+            - s3:GetObjectVersion
+            - s3:GetBucketVersioning
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - s3:PutObject
+            Resource:
+            - arn:aws:s3:::*
+            Effect: Allow
+          - Action:
+            - elasticloadbalancing:*
+            - autoscaling:*
+            - cloudwatch:*
+            - ecs:*
+            - codebuild:*
+            - iam:PassRole
+            Resource: "*"
+            Effect: Allow
+          Version: "2012-10-17"
+
+  MythicalMysfitsServicePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn:
+        Fn::Join:
+        - ""
+        - - "arn:aws:iam::"
+          - Ref: AWS::AccountId
+          - ":role/"
+          - Ref: MythicalMysfitsServiceCodePipelineServiceRole
+      Stages:
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: AWS
+            Version: "1"
+            Provider: CodeCommit
+          OutputArtifacts:
+          - Name: MythicalMysfitsService-SourceArtifact
+          Configuration:
+            BranchName: master
+            RepositoryName: MythicalMysfitsService-Repository
+          RunOrder: 1
+      - Name: Build
+        Actions:
+        - Name: Build
+          ActionTypeId:
+              Category: Build
+              Owner: AWS
+              Version: 1
+              Provider: CodeBuild
+          OutputArtifacts:
+            - Name: MythicalMysfitsService-BuildArtifact
+          InputArtifacts:
+            - Name: MythicalMysfitsService-SourceArtifact
+          Configuration:
+              ProjectName: !Ref MythicalMysfitsServiceCodeBuildProject
+          RunOrder: 1
+      - Name: Deploy
+        Actions:
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: 1
+            Provider: ECS
+          InputArtifacts:
+            - Name: MythicalMysfitsService-BuildArtifact
+          Configuration:
+            ClusterName:
+              Fn::ImportValue:
+                !Join [':', [!Ref 'ServiceStackName', 'ClusterName']]
+            ServiceName:
+              Fn::ImportValue:
+                !Join [':', [!Ref 'ServiceStackName', 'ServiceName']]
+            FileName: imagedefinitions.json
+      ArtifactStore:
+        Type: S3
+        Location:
+          Fn::Join:
+            - ""
+            - - "mythicalmysfits-serviceartifacts"
+              - "-"
+              - Ref: AWS::Region
+              - "-"
+              - Ref: AWS::AccountId
+
+  MythicalMysfitsServiceEcrRepository:
+    DependsOn: MythicalMysfitsServiceCodeBuildServiceRole
+    Type: "AWS::ECR::Repository"
+    Properties:
+      RepositoryName: "mythicalmysfits/service"
+      RepositoryPolicyText:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/MythicalMysfitsServiceCodeBuildServiceRole"
+            Action:
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
