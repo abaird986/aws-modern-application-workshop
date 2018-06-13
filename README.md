@@ -4,7 +4,7 @@
 
 **Time to Complete: 2-3 hours**
 
-**Cost to Complete: Many of the services used are included in the AWS Free Tier. For those that are not, the sample application will cost, in total, less than $1/day. **
+**Cost to Complete: Many of the services used are included in the AWS Free Tier. For those that are not, the sample application will cost, in total, less than $1/day.**
 
 **Tutorial Prereqs:**
 
