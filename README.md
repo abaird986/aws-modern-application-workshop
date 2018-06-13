@@ -345,11 +345,11 @@ When that stack has been created successfully, we first must integrate our Cloud
 First, we need to generate git credentials to interact with the created repository. AWS CodeCommit provides a credential helper for git that we will use to make integration easy.  Run the following commands in sequence the terminal (neither will report any response if successful):
 
 ```
-`git config --global user.name "*Your Name*"`
+git config --global user.name "*Your Name*"
 ```
 
 ```
-git config --global user.email your.name*`@example.*com*`*
+git config --global user.email your.name@example.com
 ```
 
 ```
@@ -488,7 +488,7 @@ Now, in just 5-10 minutes you'll see your code changes make it through your full
 Finally, we need to publish a new index.html page to our S3 bucket so that the new API functionality using query strings to filter responses will be used.  The new index.html file is located at ~/environment/modern-application-workshop/module-3/web/index.html.  Open this file in your Cloud9 IDE and replace the string indicating “REPLACE_ME” just as you did in Module 1, with the appropriate NLB endpoint.  Refer to the file you already edited in the /module-1/ directory if you need to.  After replacing the endpoint to point at your NLB, upload the new index.html file by running the following command (replacing with the name of the bucket you created in Module 1:
 
 ```
-aws s3 cp ~/environment/modern-application-workshop/module-3/web/* s3://{your_bucket_here}/
+aws s3 cp ~/environment/modern-application-workshop/module-3/web/* s3://your_bucket_name_here/
 ```
 
 Re-visit your Mythical Mysfits website to see the new population of Mysfits loading from your DynamoDB table and how the Filter functionality is working!
@@ -522,7 +522,7 @@ Another change to this CloudFormation template is that it uses the AWS **Serverl
 Transform: AWS::Serverless-2016-10-31
 ```
 
-AM gives us the ability to simply define serverless resources like APIs and Lambda functions using simplified resource definitions in JSON or YAML.  SAM also provides additional capabilities related to the packaging and testing of Lambda functions, which you'll see later in Module 5. The Transformation declaration above tells CloudFormation that our template should be transformed using the specified version of SAM.  For this module, we'll use SAM to let us define our API in-line using a Swagger 2.0 definition.  
+SAM gives us the ability to simply define serverless resources like APIs and Lambda functions using simplified resource definitions in JSON or YAML.  SAM also provides additional capabilities related to the packaging and testing of Lambda functions, which you'll see later in Module 5. The Transformation declaration above tells CloudFormation that our template should be transformed using the specified version of SAM.  For this module, we'll use SAM to let us define our API in-line using a Swagger 2.0 definition.  
 In order to push this update out to the service stack in CloudFormation, we'll use a different command than before, called **deploy**.
 
 This command will take the SAM template that we have created and transform it into typical CloudFormation, generate the **change set** to be applied to our stack (indicating which resources in the stack will be created, modified or deleted), then subsequently execute the changes to the stack using the same update-stack command we used in the last module.  To add the Cogntio User Pool and API Gateway API to our service stack run the following command in your terminal:
@@ -551,7 +551,7 @@ Copy the OutputValue listed for the OutputKeys of ApiEndpoint, UserPoolId, and U
 
 ### Editing and Publishing the Website
 
-Open the new version of the Mythical Mysfits index.html file we will push to S3 shortly, it is located at: **~/environment/modern-application-workshop/module-4/app/web/index.html**
+Open the new version of the Mythical Mysfits index.html file we will push to S3 shortly, it is located at: `~/environment/modern-application-workshop/module-4/app/web/index.html`
 In this new index.html file, you'll notice additional HTML and JavaScript code that is being used to add a user registration and login experience.  This code is interacting with the AWS Cognito JavaScript SDK to help manage registration, authentication, and authorization to all of the API calls that require it.
 
 In this file, replace the strings 'REPLACE_ME' inside the single quotes with the endpoint OutputValues you copied from above and save the file:
@@ -730,6 +730,6 @@ This experience was meant to give you a taste of what it's like to be a develope
 
 As a great next step, to learn more about the inner workings of the Mythical Mysfits website that you've created, dive into the provided CloudFormation templates and the resources declared within them.
 
-We hope you have enjoyed the AWS Modern Application Workshop!  If you have any feedback or questions, don't hesitate to post a comment or send an email to andbaird@amazon.com.
+We hope you have enjoyed the AWS Modern Application Workshop!  If you find any issues or have feedback/questions, don't hesitate to open an issue or send an email to andbaird@amazon.com.
 
 Thank you!
