@@ -330,7 +330,7 @@ In this module, you will create a fully managed CI/CD stack that will automatica
 First, let's delete the repository you created by hand during the last module so that CloudFormation can create it anew as part of this holistic CI/CD stack.  Run the following in the terminal:
 
 ```
-aws ecr delete-repository —repository-name mythicalmysfits/service —force
+aws ecr delete-repository —-repository-name mythicalmysfits/service -—force
 ```
 
 **Note:** In a real-world scenario, you would more typically create this CI/CD stack as development begins and then create the service stack once you need to first deploy the code you've written.  But, for this workshop we had you create the service first to become familiar with its concepts before deploying to it with automation.
