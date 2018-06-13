@@ -191,7 +191,7 @@ All of the code required to run our service backend is stored within the `/modul
 
 Docker comes already installed on the Cloud9 IDE that you've created, so in order to build the docker image locally, all we need to do is run the following commands in the Cloud9 terminal:
 
-* First change directory to ~/environment/module-2/app
+* First change directory to `~/environment/module-2/app`
 
 ```
 cd ~/environment/aws-modern-application-workshop/module-2/app
@@ -297,7 +297,8 @@ http://Mythi-Publi-123456789-abc123456.elb.us-east-1.amazonaws.com/mysfits
 
 A response showing the same JSON response we received earlier when testing the docker container locally in Cloud9 means your Flask API is up and running on AWS Fargate.
 
-Next, we need to integrate our website with your new API backend instead of using the hard coded data that we previously uploaded to S3.  You'll need to update the following file to use the same NLB URL for API calls (do not inlcude the /mysfits path): /module-2/web/index.html
+Next, we need to integrate our website with your new API backend instead of using the hard coded data that we previously uploaded to S3.  You'll need to update the following file to use the same NLB URL for API calls (do not inlcude the /mysfits path): `/module-2/web/index.html`
+
 Open the file in Cloud9 and replace the highlighted area below between the quotes with the NLB URL:
 
 ![before replace](/images/module-2/before-replace.png)
