@@ -488,7 +488,7 @@ Now, in just 5-10 minutes you'll see your code changes make it through your full
 Finally, we need to publish a new index.html page to our S3 bucket so that the new API functionality using query strings to filter responses will be used.  The new index.html file is located at ~/environment/modern-application-workshop/module-3/web/index.html.  Open this file in your Cloud9 IDE and replace the string indicating “REPLACE_ME” just as you did in Module 1, with the appropriate NLB endpoint.  Refer to the file you already edited in the /module-1/ directory if you need to.  After replacing the endpoint to point at your NLB, upload the new index.html file by running the following command (replacing with the name of the bucket you created in Module 1:
 
 ```
-aws s3 cp ~/environment/modern-application-workshop/module-3/web/* s3://your_bucket_name_here/
+aws s3 cp --recursive ~/environment/modern-application-workshop/module-3/web/ s3://your_bucket_name_here/
 ```
 
 Re-visit your Mythical Mysfits website to see the new population of Mysfits loading from your DynamoDB table and how the Filter functionality is working!
@@ -561,7 +561,7 @@ In this file, replace the strings 'REPLACE_ME' inside the single quotes with the
 Now, lets copy this file, as well as the Cognito JavaScript SDK to the S3 bucket hosting our Mythical Mysfits website content so that the new features will be published online.
 
 ```
-aws s3 cp ~/environment/modern-application-workshop/module-4/web/* s3://YOUR-S3-BUCKET/
+aws s3 cp --recursive ~/environment/modern-application-workshop/module-4/web/ s3://YOUR-S3-BUCKET/
 ```
 
 Refresh the Mythical Mysfits website in your browser to see the new functionality in action!
