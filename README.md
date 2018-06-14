@@ -467,7 +467,7 @@ cp ~/environment/aws-modern-application-workshop/module-3/app/service/* ~/enviro
 Now, we need to check in these code changes to CodeCommit using the git command line client.  Run the following commands to check in the new code changes and kick of your CI/CD pipeline:
 
 ```
-cd ~/environment/MythicalMysfitsRepository
+cd ~/environment/MythicalMysfitsService-Repository
 ```
 
 ```
@@ -548,18 +548,46 @@ Below is an example output you should find in the response to the above command 
 }
 ```
 
-Copy the OutputValue listed for the OutputKeys of ApiEndpoint, UserPoolId, and UserPoolClientId and save them to a text editor or similar so that you can reference them in the next step.
+Copy the OutputValue listed for the OutputKeys of ApiEndpoint, UserPoolId, and UserPoolClientId and save them to a text editor or similar so that you can reference them in the final step of this module.
+
+### Updating Your Service Backend
+
+To accommodate the new functionality to view Mysfit Profiles, like, and adopt them, we have included updated Python code for your backend Flask web service.  Let's overwrite your existing codebase with these files and push them into the repository:
+
+```
+cd ~/environment/MythicalMysfitsService-Repository/
+```
+
+```
+cp -r ~/environment/aws-modern-application-workshop/module-4/app/* .
+```
+
+```
+git add .
+```
+
+```
+git commit -m "Update service code backend to enable additional website features."
+```
+
+```
+git push
+```
+
+While those service updates are being automatically pushed through your CICD pipeline, continue on to the next step.
 
 ### Editing and Publishing the Website
 
 Open the new version of the Mythical Mysfits index.html file we will push to S3 shortly, it is located at: `~/environment/aws-modern-application-workshop/module-4/app/web/index.html`
 In this new index.html file, you'll notice additional HTML and JavaScript code that is being used to add a user registration and login experience.  This code is interacting with the AWS Cognito JavaScript SDK to help manage registration, authentication, and authorization to all of the API calls that require it.
 
-In this file, replace the strings 'REPLACE_ME' inside the single quotes with the endpoint OutputValues you copied from above and save the file:
+In this file, replace the strings **REPLACE_ME** inside the single quotes with the endpoint OutputValues you copied from above and save the file:
 
 ![before-replace](/images/module-4/before-replace.png)
 
-Now, lets copy this file, as well as the Cognito JavaScript SDK to the S3 bucket hosting our Mythical Mysfits website content so that the new features will be published online.
+Also, for the user registration process, you have an additional two HTML files to insert these values into.  `register.html` and `confirm.html`.  Insert the copied values into the **REPLACE_ME** strings in these files as welly.
+
+Now, lets copy these HTML files, as well as the Cognito JavaScript SDK to the S3 bucket hosting our Mythical Mysfits website content so that the new features will be published online.
 
 ```
 aws s3 cp --recursive ~/environment/aws-modern-application-workshop/module-4/web/ s3://YOUR-S3-BUCKET/
@@ -600,7 +628,7 @@ This new stack you will deploy using CloudFormation will not only contain the in
 
 First, let's create a new CodeCommit repository where the streaming service code will live:
 ```
-aws codecommit create-respository --repository-name MythicalMysfitsStreamingService-Repository
+aws codecommit create-repository --repository-name MythicalMysfitsStreamingService-Repository
 ```
 
 In the response to that command, copy the value for `"cloneValueUrl"`.  It should be of the form:
@@ -622,12 +650,20 @@ cd ~/environment/MythicalMysfitsStreamingService-Repository/
 
 Then, copy the module-5 application components into this new repository directory:
 ```
-cp r ~/environment/aws-modern-application-workshop/module-5/app/streaming/* .
+cp -r ~/environment/aws-modern-application-workshop/module-5/app/streaming/* .
+```
+
+And let's copy the CloudFormation template for this module as well.
+
+```
+cp ~/environment/aws-modern-application-workshop/module-5/cfn/* .
 ```
 
 Now, we have the repository directory set with all of the provided artifacts:
 * A CFN template for creating the full stack.
 * A Python script that contains the code for our Lambda function: `streamProcessor.py`
+
+This is a common approach that AWS customers take - to store their CloudFormation templates alongside their application code in a repository. That way, you have a single place where all changes to application and it's environment can be tracked together.
 
 But, if you look at the code inside the `streamProcessor.py` file, you'll notice that it's using the `requests` Python package to make an API requset to the Mythical Mysfits service you created previously.  External libraries are not automatically included in the AWS Lambda runtime environment.  You will need to package all of your library dependencies together with your Lambda code function prior to it being uploaded to the Lambda service.  We will use the Python package manager `pip` to accomplish this.  In the Cloud9 terminal, run the following command to install the `requests` package and it's dependencies locally alongside your function code:
 
@@ -670,7 +706,7 @@ aws s3 mb s3://mythical-mysfits-streaming-code-uniquestringhere/
 With our bucket created, we are ready to use the SAM CLI to package and upload our code and transform the CloudFormation template, be sure to replace the last command parameter with the bucket name you just created above (this command also assumes your terminal is still in the repository working directory):
 
 ```
-sam package --template-file ./cfn/real-time-streaming.yml --output-template-file ./cfn/transformed-streaming.yml --s3-bucket replace-with-your-bucket-name
+sam package --template-file ./real-time-streaming.yml --output-template-file ./transformed-streaming.yml --s3-bucket replace-with-your-bucket-name
 ```
 
 If successful, you will see the newly created `transformed-streaming.yml` file exist within the `./cfn/` directory, if you look in its contents, you'll see that the sourceUri parameter of the serverless Lambda function has been updated with the object location where the SAM CLI has uploaded your packaged code.
@@ -705,7 +741,7 @@ aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingStack
 Replace the final value within `index.html` for the streamingApiEndpoint and you are ready to publish your final Mythical Mysfits home page update:
 
 ```
-aws s3 cp ~/environment/aws-modern-application-workshop/module-5/app/web/index.html s3://YOUR-S3-BUCKET/
+aws s3 cp ~/environment/aws-modern-application-workshop/module-5/web/index.html s3://YOUR-S3-BUCKET/
 ```
 
 Refresh your Mythical Mysfits website in the browser once more and you will now have a site that records and publishes each time a user clicks on a mysfits profile!
