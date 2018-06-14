@@ -1,7 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-Description: Deploy a service on AWS Fargate, hosted in a private subnet, but accessible via a public load balancer.
+Description: A stack that gives Mythical Mysfits the abillity to ingest user
+            clicks and process them in real time.
 Parameters:
   ServiceStackName:
     Type: String
@@ -9,6 +10,9 @@ Parameters:
     Description: The name of the parent Fargate service stack that you created. Necessary
                  to locate and reference resources created by that stack.
 Resources:
+  # A Kinesis Firehose Delivery Stream that provides real-time record ingestion
+  # and native integration with AWS Lambda functions for real-time processing
+  # of those records before they are stored in Amazon S3.
   MysfitsFireHoseToS3:
     DependsOn:
       - FirehoseDeliveryPolicy
@@ -34,12 +38,15 @@ Resources:
                   ParameterValue: !GetAtt MysfitsClicksProcessor.Arn
               Type: Lambda
 
+  # An Amazon S3 bucket where the click records are stored after they are
+  # processed by a Lambda function.
   ClicksDestinationBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       VersioningConfiguration:
         Status: Enabled
 
+  # The IAM role for the above Firehose Delivery Stream.
   FirehoseDeliveryRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -55,6 +62,9 @@ Resources:
               StringEquals:
                 'sts:ExternalId': !Ref 'AWS::AccountId'
 
+  # An IAM policy for the above IAM Role which gives our Delivery Stream
+  # the ability to invoke the  created Lambda function, as well as deliver
+  # records to the created S3 bucket.
   FirehoseDeliveryPolicy:
     Type: 'AWS::IAM::Policy'
     DependsOn:
@@ -90,15 +100,17 @@ Resources:
       Roles:
         - !Ref FirehoseDeliveryRole
 
+  # An AWS Lambda function that will process and enrich mysfit profile clicks
+  # before they are stored in Amazon S3.
   MysfitsClicksProcessor:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: streamProcessor.processRecord
       Runtime: python3.6
       CodeUri: .
-      Description: An Amazon Kinesis Firehose stream processor that accesses the records in
-        the input and returns them with a processing status.  Use this processor
-        for any custom transformation logic.
+      Description: An Amazon Kinesis Firehose stream processor that enriches click
+                   records to not just include a mysfitId, but also other
+                   attributes that can be analyzed later.
       MemorySize: 128
       Timeout: 30
       Policies:
@@ -116,6 +128,8 @@ Resources:
                     - Ref: 'AWS::AccountId'
                     - ':table/MysfitsTable'
 
+ # A Lambda Permission resource that permits the created Firehose Delivery
+ # Stream to act as an Event Source for the above AWS Lambda function.
   MysfitsClicksProcessorPermission:
     Type: "AWS::Lambda::Permission"
     Properties:
@@ -125,6 +139,7 @@ Resources:
       SourceAccount: !Ref AWS::AccountId
       SourceArn: !GetAtt MysfitsFireHoseToS3.Arn
 
+  # An API Gateway execution role for the below REST API.
   ClickProcessingApiRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -137,6 +152,8 @@ Resources:
               Service: apigateway.amazonaws.com
             Action: 'sts:AssumeRole'
 
+  # An IAM policy that permits our created streaming API service to integrate
+  # with the Kinesis Firehose API PutRecord as an AWS Service Proxy.
   ClickProcessingApiPolicy:
     Type: 'AWS::IAM::Policy'
     DependsOn:
@@ -153,6 +170,8 @@ Resources:
       Roles:
         - !Ref ClickProcessingApiRole
 
+  # A new REST API that acts as an AWS Service proxy to the Kinesis Firehose
+  # PutRecord API.
   ClickProcessingApi:
     Type: AWS::Serverless::Api
     DependsOn:
@@ -199,6 +218,11 @@ Resources:
                   httpMethod: POST
                   type: AWS
                   uri: !Join ["", ["arn:aws:apigateway:", { "Ref": "AWS::Region" }, ":firehose:action/PutRecord" ] ]
+                  # The below requestTemplate transforms the incoming JSON
+                  # payload into the request object structure that the Kinesis
+                  # Firehose PutRecord API requires. So now our frontend
+                  # JavaScript can call an API that we have designed ourselves
+                  # while actually directly integrating with an AWS Service API.
                   requestTemplates:
                     application/json: !Join ["", ["{ \"DeliveryStreamName\": \"", !Ref MysfitsFireHoseToS3, "\",    \"Record\": {   \"Data\": \"$util.base64Encode($input.json('$'))\" } }" ] ]
                   requestParameters:

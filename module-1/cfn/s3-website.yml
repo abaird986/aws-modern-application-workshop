@@ -1,13 +1,31 @@
+---
 AWSTemplateFormatVersion: 2010-09-09
+Description: This template creates the necessary resources for public website
+            hosting with Amazon S3. This will be where the static content for
+            the Mythical Mysfits website (HTML, JavaScript, images) will
+            be stored and served to user web browsers.
 Resources:
+  # An Amazon S3 bucket where the static Mythical Mysfits website content will
+  # be published to and stored. Included is WebsiteConfiguration details that
+  # allow this S3 bucket to be accessed via a public DNS name using HTTP or
+  # HTTPS, and for requests to the provided public DNS name base path to be
+  # routed to the object will store in the bucket later, index.html. We have
+  # not configured an error page for this demo website, but if provided, any
+  # error responses (like 404 errors, if a user requests a page that does not
+  # exist as an object within the bucket) would be redirected to the configured
+  # error page.
   S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
-        ErrorDocument: error.html
+        ErrorDocument: not_used.html
     DeletionPolicy: Retain
+
+  # A bucket policy that allows the objects stored in the above S3 bucket
+  # to be publicly readable, a requirement when using Amazon S3 to host
+  # content for a public website to be made available on the Internet.
   BucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
     Properties:
@@ -25,12 +43,16 @@ Resources:
                 - !Ref S3Bucket
                 - /*
       Bucket: !Ref S3Bucket
+
+# Output objects are provided in the response to the CloudFormaiton API call
+# describe-stack. These two objects will make it easy to retrieve the DNS names
+# that can be used to direct a browser to the Mythical Mysfits website.
 Outputs:
   WebsiteURL:
     Value: !GetAtt
       - S3Bucket
       - WebsiteURL
-    Description: URL for website hosted on S3
+    Description: HTTP URL for website hosted on S3
   S3BucketSecureURL:
     Value: !Join
       - ''
@@ -38,4 +60,4 @@ Outputs:
         - !GetAtt
           - S3Bucket
           - DomainName
-    Description: Name of S3 bucket to hold website content
+    Description: HTTPS URL for the website hosted on S3.

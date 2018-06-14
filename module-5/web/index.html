@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!--
+      A new version of the Mythical Mysfits API that includes updated JavaScript
+      code to send an additional PUT request whenever a mysfit profile is viewed
+      by a user.
+    -->
     <title>Mythical Mysfits</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -391,6 +396,11 @@
 
     });
 
+    /*
+      A new event handling funciton if the profile modal is triggered,
+      to record that click event and sent it to our new streaming service
+      backend.
+    */
     $('#profileModal').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget);
       var mysfitId = button.data('mysfitid');
@@ -535,6 +545,9 @@
       });
     }
 
+  /*
+   The new JavaScript function created for module-5 that records profile clicks.
+  */
   function recordProfileClick(clickedMysfitId) {
 
     var clicksApi = streamingApiEndpoint + '/clicks';

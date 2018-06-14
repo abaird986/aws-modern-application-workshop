@@ -1,6 +1,7 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Create the resources required for a CI/CD pipeline to deploy checked-in code changes to a Fargate service.
+Description: Create the resources required for a CI/CD pipeline
+             to deploy checked-in code changes to a Fargate service.
 
 Parameters:
   ServiceStackName:
@@ -10,7 +11,8 @@ Parameters:
                  and reference resources created by that stack.
 
 Resources:
-
+  # An S3 bucket where AWS CodePipeline can store and retrieve artifacts
+  # being used throughout the execution of a pipeline execution.
   MythicalMysfitsServiceArtifactsBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -23,6 +25,8 @@ Resources:
           - "-"
           - Ref: AWS::AccountId
 
+  # A policy for the above bucket that only allows the CodePipeline service to
+  # perform the necessary API actions against the contents in the bucket.
   S3BucketPolicy:
     DependsOn:
     - "MythicalMysfitsServiceArtifactsBucket"
@@ -59,12 +63,16 @@ Resources:
           - Fn::Sub: "arn:aws:s3:::mythicalmysfits-serviceartifacts-${AWS::Region}-${AWS::AccountId}"
 
 
+  # A code repository for the Mythical Mysfits backend Flask service codebase.
   MythicalMysfitsServiceRepository:
     Type: AWS::CodeCommit::Repository
     Properties:
       RepositoryName: MythicalMysfitsService-Repository
       RepositoryDescription: Code required to create the MythicalMysfits website and backend service.
 
+  # An IAM role that allows the AWS CodeBuild service to perform the actions
+  # required to complete a build of our source code retrieved from CodeCommit,
+  # and push the created image to ECR.
   MythicalMysfitsServiceCodeBuildServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -109,6 +117,8 @@ Resources:
             - "ecr:GetAuthorizationToken"
             Resource: "*"
 
+  # An AWS CodeBuild project, which defines the infrastructure and build server
+  # requirements that our Mythical Mysfits service will require to be built.
   MythicalMysfitsServiceCodeBuildProject:
     Type: AWS::CodeBuild::Project
     DependsOn: MythicalMysfitsServiceCodeBuildServiceRole
@@ -139,6 +149,12 @@ Resources:
             - Ref: AWS::Region
             - ".amazonaws.com/v1/repos/MythicalMysfitsServiceRepository"
 
+  # An IAM role that allows the AWS CodePipeline service to perform it's
+  # necessary actions. We have intentionally left permissions on this role
+  # that will not be used by the CodePipeline service during this workshop.
+  # This will allow you to more simply use CodePipeline in the future should
+  # you want to use the service for Pipelines that interact with different
+  # AWS services than the ones used in this workshop.
   MythicalMysfitsServiceCodePipelineServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -186,6 +202,14 @@ Resources:
             Effect: Allow
           Version: "2012-10-17"
 
+  # The CodePipeline Pipeline that defines the workflow for the Mythical Mysfits
+  # CI/CD pipeline. This includes:
+  #   - A Source step where code is retrieved from CodeCommit whenever
+  #     a commit occurs to the master branch.
+  #   - A Build step that initates a build execution job using the CodeBuild
+  #     project defined above.
+  #   - A deployment step that deploys the build container image to the ECS
+  #     service that is defined in the service.yml template.
   MythicalMysfitsServicePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -256,6 +280,8 @@ Resources:
               - "-"
               - Ref: AWS::AccountId
 
+  # The ECR repository where service docker images will be pushed to by
+  # CodeBuild and retrieved from during ECS service deployments.
   MythicalMysfitsServiceEcrRepository:
     DependsOn: MythicalMysfitsServiceCodeBuildServiceRole
     Type: "AWS::ECR::Repository"

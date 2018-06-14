@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+  <!--
+    The next iteration of our Mythical Mysfits website. Updates include
+    dynamically pulling the mysfits from our backend service via the network
+    load balancer DNS name. There is also additional functionality for filtering
+    mysfits that we have yet to implement on the backend service.  You will see
+    the buttons available on the webpage, but because that functionality isn't
+    implemented on the backend, it does not yet work.  You will implement it during
+    module 3!
+  -->
   <head>
     <title>Mythical Mysfits</title>
     <meta charset="utf-8">
@@ -61,7 +70,7 @@
   </body>
   <script>
 
-    var mysfitsApiEndpoint = 'REPLACE_ME';
+    var mysfitsApiEndpoint = 'REPLACE_ME'; // example: 'http://mythi-publi-abcd12345-01234567890123.elb.us-east-1.amazonaws.com'
 
     var app = angular.module('mysfitsApp', []);
 
@@ -76,6 +85,7 @@
 
       filterScope = $scope;
 
+      // The possible options for Mysfits to populate the dropdown filters.
       $scope.filterOptionsList =
        {
          "categories": [
@@ -98,10 +108,17 @@
          ]
        };
 
+       /*
+          The View All button has been selected, retrieve all the mysfits.
+      */
        $scope.removeFilter = function() {
          allMysfits = getAllMysfits(applyGridScope);
        }
 
+       /*
+         This API hasn't been implemented on the service backend yet. You will
+         implement it during module 3!
+       */
        $scope.queryMysfits = function(filterCategory, filterValue) {
 
            var petsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategory + "&value=" + filterValue;
@@ -114,6 +131,7 @@
              },
              error : function(response) {
                console.log("could not retrieve mysfits list.");
+               console.log(response.message);
              }
            });
        }
@@ -122,6 +140,9 @@
 
     });
 
+    /*
+      Populate the main mysfit grid on page load.
+    */
     app.controller('mysfitsListController', function($scope) {
 
       gridScope = $scope;
@@ -130,11 +151,18 @@
 
     });
 
+    /*
+      Reload the grid of mysfits whenever a new list is retrieved based
+      on the filters selected.
+    */
     function applyGridScope(mysfitsList) {
       gridScope.mysfits = mysfitsList;
       gridScope.$apply();
     }
 
+    /*
+      Retrieve the full list of mysfits from the backend service API.
+    */
     function getAllMysfits(callback) {
 
       var petsApi = mysfitsApiEndpoint + '/mysfits';
@@ -147,6 +175,7 @@
         },
         error : function(response) {
           console.log("could not retrieve mysfits list.");
+          console.log(response.message);
         }
       });
     }

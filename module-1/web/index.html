@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+  <!--
+    The first iteration and a static version of the Mythical Mysfits website.
+    This site does not integrate with any service backend for dynamic content.
+    All of the mysfits displayed are provided as JSON objects directly within
+    the JavaScript at the end of this file.
+  -->
   <head>
     <title>Mythical Mysfits</title>
     <meta charset="utf-8">
@@ -50,6 +56,7 @@
 
     app.controller('mysfitsListController', function($scope) {
 
+      // the list of Mysfits to be displayed on the MythicalMysfits website.
       $scope.mysfits =
         [
           {
