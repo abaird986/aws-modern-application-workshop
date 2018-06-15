@@ -581,11 +581,11 @@ While those service updates are being automatically pushed through your CICD pip
 Open the new version of the Mythical Mysfits index.html file we will push to S3 shortly, it is located at: `~/environment/aws-modern-application-workshop/module-4/app/web/index.html`
 In this new index.html file, you'll notice additional HTML and JavaScript code that is being used to add a user registration and login experience.  This code is interacting with the AWS Cognito JavaScript SDK to help manage registration, authentication, and authorization to all of the API calls that require it.
 
-In this file, replace the strings **REPLACE_ME** inside the single quotes with the endpoint OutputValues you copied from above and save the file:
+In this file, replace the strings **REPLACE_ME** inside the single quotes with the OutputValues you copied from above and save the file:
 
 ![before-replace](/images/module-4/before-replace.png)
 
-Also, for the user registration process, you have an additional two HTML files to insert these values into.  `register.html` and `confirm.html`.  Insert the copied values into the **REPLACE_ME** strings in these files as welly.
+Also, for the user registration process, you have an additional two HTML files to insert these values into.  `register.html` and `confirm.html`.  Insert the copied values into the **REPLACE_ME** strings in these files as well.
 
 Now, lets copy these HTML files, as well as the Cognito JavaScript SDK to the S3 bucket hosting our Mythical Mysfits website content so that the new features will be published online.
 
