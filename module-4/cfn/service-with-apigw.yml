@@ -33,7 +33,7 @@ Parameters:
                  assigned to different paths on the load balancer.
   DesiredCount:
     Type: Number
-    Default: 2
+    Default: 1
     Description: How many copies of the service task to run
 
 Resources:
@@ -248,7 +248,7 @@ Resources:
   # authorized useres should be able to call (to like and adopt mysfits) will
   # integrate with the above created Cognito User Pool and insure the
   # Authorization header provided with the API request is a valid authorization
-  # token for an authenticated user in the user pool. 
+  # token for an authenticated user in the user pool.
   MysfitsApigwApi:
     Type: AWS::Serverless::Api
     DependsOn:
