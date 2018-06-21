@@ -134,7 +134,7 @@ That concludes Module 1.
 
 # Module 2: Creating a Service with AWS Fargate
 
-**Time to complete:** 60 minutes
+**Time to complete:** 90 minutes
 
 **Services used:**
 * AWS CloudFormation
@@ -551,7 +551,7 @@ That concludes module 3.
 
 # Module 4: Adding User and API features with Amazon API Gateway and AWS Cognito
 
-**Time to complete:** 40 minutes
+**Time to complete:** 60 minutes
 
 **Services used:**
 * Amazon Cognito
