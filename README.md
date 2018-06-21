@@ -2,7 +2,7 @@
 
 **AWS Experience: Beginner**
 
-**Time to Complete: 2-3 hours**
+**Time to Complete: 3-4 hours**
 
 **Cost to Complete: Many of the services used are included in the AWS Free Tier. For those that are not, the sample application will cost, in total, less than $1/day.**
 
@@ -34,7 +34,6 @@ You will be creating and deploying changes to this application completely progra
 
 **Services used:**
 * AWS Cloud9
-* AWS CloudFormation
 * Amazon Simple Storage Service (S3)
 
 In this module, follow the instructions to create your cloud-based IDE on AWS Cloud9 and deploy the first version of the static Mythical Mysfits website.  Amazon S3 is a highly durable, highly available, and inexpensive object storage service that can serve stored objects directly via HTTP. This makes it wonderfully useful for serving static web content (html, js, css, media content, etc.) directly to web browsers for sites on the Internet.  We will utilize S3 to host the content for our Mythical Mysfits website.
@@ -352,21 +351,21 @@ First, you'll need a place to push and store your code in. Create an **AWS CodeC
 aws codecommit create-repository --repository-name MythicalMysfitsService-Repository
 ```
 
-Next, we need to create another S3 bucket that will be used to store the temporary artifacts that are created in the middle of our CICD pipeline executions.  Choose a new bucket name for these artifacts and create one using the following CLI command:
+Next, we need to create another S3 bucket that will be used to store the temporary artifacts that are created in the middle of our CI/CD pipeline executions.  Choose a new bucket name for these artifacts and create one using the following CLI command:
 
 ```
 aws s3 mb s3://mythical-mysfits-artifacts-bucket-name
 ```
 
-Next, this bucket needs a bucket policy to define permissions for the data stored within it. But unlike our website bucket that allowed access to anyone, only our CICD pipeline should have access to this bucket.  We have provided the JSON file needed for this policy at `~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json`.  Open this file, and inside you will need to replace several strings to include the ARNs that were created as part of the MythicalMysfitsCoreStack earlier, as well as your newly chosen bucket name for your CICD artifacts.
+Next, this bucket needs a bucket policy to define permissions for the data stored within it. But unlike our website bucket that allowed access to anyone, only our CI/CD pipeline should have access to this bucket.  We have provided the JSON file needed for this policy at `~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json`.  Open this file, and inside you will need to replace several strings to include the ARNs that were created as part of the MythicalMysfitsCoreStack earlier, as well as your newly chosen bucket name for your CI/CD artifacts.
 
-Once you've modified and saved this file, execute the following command to grant access to this bucket to your CICD pipeline:
+Once you've modified and saved this file, execute the following command to grant access to this bucket to your CI/CD pipeline:
 
 ```
 aws s3api put-bucket-policy --bucket mythical-mysfits-artifacts-bucket-name --policy file://~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json
 ```
 
-With a repository to store our code in, and an S3 bucket that will be used for our CICD artifacts, lets add to the CICD stack with a way for a service build to occur.  This will be accomplished by creating an **AWS CodeBuild Project**.  Any time a build execution is triggered, AWS CodeBuild will automatically provision a build server to our configuration and execute the steps required to build our docker image and push a new version of it to the ECR repository we created (and then spin the server down when the build is completed).  The steps for our build (which package our Python code and build/push the Docker container) are included in the `~/environment/aws-modern-application-workshop/module-2/app/buildspec.yml` file.  The **buildspec.yml** file is what you create to instruct CodeBuild what steps are required for a build execution within a CodeBuild project.
+With a repository to store our code in, and an S3 bucket that will be used for our CI/CD artifacts, lets add to the CI/CD stack with a way for a service build to occur.  This will be accomplished by creating an **AWS CodeBuild Project**.  Any time a build execution is triggered, AWS CodeBuild will automatically provision a build server to our configuration and execute the steps required to build our docker image and push a new version of it to the ECR repository we created (and then spin the server down when the build is completed).  The steps for our build (which package our Python code and build/push the Docker container) are included in the `~/environment/aws-modern-application-workshop/module-2/app/buildspec.yml` file.  The **buildspec.yml** file is what you create to instruct CodeBuild what steps are required for a build execution within a CodeBuild project.
 
 To create the CodeBuild project, another CLI input file is required to be updated with parameters specific to your resources. It is located at `~/environment/aws-modern-application-workshop/module-2/aws-cli/code-build-project.json`.  Similarly replace the values within this file as you have done before from the MythicalMysfitsCoreStackOutput. Once saved, execute the following with the CLI to create the project:
 
@@ -386,13 +385,13 @@ Once saved, create a pipeline in CodePipeline with the following command:
 aws codepipeline create-pipeline --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-pipeline.json
 ```
 
-We have one final step before our CICD pipeline can execute end-to-end successfully. With a CICD pipeline in place, you won't be manually pushing container images into ECR anymore.  CodeBuild will be pushing new images now. We need to give CodeBuild permission to perform actions on your image repository with an **ECR repository policy***.  The policy document needs to be updated with the specific ARN for the CodeBuild role created by the MythicalMysfitsCoreStack, and the policy document is located at `~/environment/aws-modern-application-workshop/module-2/aws-cli/ecr-policy.json`.  Update and save this file and then run the following command to create the policy:
+We have one final step before our CI/CD pipeline can execute end-to-end successfully. With a CI/CD pipeline in place, you won't be manually pushing container images into ECR anymore.  CodeBuild will be pushing new images now. We need to give CodeBuild permission to perform actions on your image repository with an **ECR repository policy***.  The policy document needs to be updated with the specific ARN for the CodeBuild role created by the MythicalMysfitsCoreStack, and the policy document is located at `~/environment/aws-modern-application-workshop/module-2/aws-cli/ecr-policy.json`.  Update and save this file and then run the following command to create the policy:
 
 ```
 aws ecr set-repository-policy --repository-name mythicalmysfits/service --policy-text file://~/environment/aws-modern-application-workshop/module-2/aws-cli/ecr-policy.json
 ```
 
-When that has been created successfully, you have a working end-to-end CICD pipeline to deliver code changes automatically to your service in ECS.
+When that has been created successfully, you have a working end-to-end CI/CD pipeline to deliver code changes automatically to your service in ECS.
 
 To test out the new pipeline, we need to configure git within your Cloud9 IDE and integrate it with your CodeCommit repository.
 
@@ -454,10 +453,9 @@ This concludes Module 2.
 
 # Module 3 - Adding a Data Tier with Amazon DynamoDB
 
-**Time to complete:** 30 minutes
+**Time to complete:** 20 minutes
 
 **Services used:**
-* AWS CloudFormation
 * Amazon DynamoDB
 
 ### Overview
@@ -466,15 +464,15 @@ Now that you have a service deployed and a working CI/CD pipeline to deliver cha
 
 ### Creating A DynamoDB Table using CloudFormation
 
-To add the DynamoDB table to the architecture, we have included another CloudFormation template that contains the resource definition required to create a table called **MysfitsTable**. This table will have a primary index defined by a hash key attribute called **MysfitId**, and two more secondary indexes.  The first secondary index will have the hash key of **Species** and a range key of **MysfitId**, and the second secondary index will have the hash key of **Alignment** and a range key of **MysfitId**.  These two secondary indexes will allow us to execute queries against the table to retrieve all of the mysfits that match a given Species or Alignment to enable the filter functionality you may have noticed isn't yet working on the website.
+To add a DynamoDB table to the architecture, we have included another JSON CLI input file that defines a table called **MysfitsTable**. This table will have a primary index defined by a hash key attribute called **MysfitId**, and two more secondary indexes.  The first secondary index will have the hash key of **Species** and a range key of **MysfitId**, and the second secondary index will have the hash key of **Alignment** and a range key of **MysfitId**.  These two secondary indexes will allow us to execute queries against the table to retrieve all of the mysfits that match a given Species or Alignment to enable the filter functionality you may have noticed isn't yet working on the website.  You can view this file at `~/environment/aws-modern-application-workshop/module-3/aws-cli/dynamodb-table.json`. No changes need to be made to this file and it is ready to execute.
 
-To create the table using CloudFormation, execute the following command in the Cloud9 terminal:
+To create the table using the AWS CLI, execute the following command in the Cloud9 terminal:
 
 ```
-aws cloudformation update-stack --stack-name MythicalMysfitsServiceStack --template-body file://~/environment/aws-modern-application-workshop/module-3/cfn/service-with-ddb.yml
+aws dynamodb create-table --cli-input-json file://~/environment/aws-modern-application-workshop/module-3/aws-cli/dynamodb-table.json
 ```
 
-After the stack completes updating, you can view your newly created table either in the DynamoDB  console or by executing the following AWS CLI command in the terminal:
+After the command runs, you can view the details of your newly created table by executing the following AWS CLI command in the terminal:
 
 ```
 aws dynamodb describe-table --table-name MysfitsTable
@@ -498,7 +496,7 @@ aws dynamodb scan --table-name MysfitsTable
 Also provided is a JSON file that can be used to batch insert a number of Mysfit items into this table.  This will be accomplished through the DynamoDB API **BatchWriteItem.** To call this API using the provided JSON file, execute the following terminal command (the response from the service should report that there are no items that went unprocessed):
 
 ```
-aws dynamodb batch-write-item --request-items file://~/environment/aws-modern-application-workshop/lib/populate-dynamodb.json
+aws dynamodb batch-write-item --request-items file://~/environment/aws-modern-application-workshop/module-3/aws-cli/populate-dynamodb.json
 ```
 
 Now, if you run the same command to scan all of the table contents, you'll find the items have been loaded into the table:
@@ -509,7 +507,7 @@ aws dynamodb scan --table-name MysfitsTable
 
 ### Committing your first *real* Code change
 
-Now that we have our data included in the table, let's modify our application code to read from this table instead of returning the static JSON file response that was used in Module 2.  We have included a new set of Python files for your Flask microservice, but now instead of reading the static JSON file will make a request to DynamoDB.
+Now that we have our data included in the table, let's modify our application code to read from this table instead of returning the static JSON file that was used in Module 2.  We have included a new set of Python files for your Flask microservice, but now instead of reading the static JSON file will make a request to DynamoDB.
 
 The request is formed using the AWS Python SDK called **boto3**. This SDK is a powerful yet simple way to interact with AWS services via Python code. It enables you to use service client definitions and functions that have great symmetry with the AWS APIs and CLI commands you've already been executing as part of this workshop.  Translating those commands to working Python code is simple when using **boto3**.  To copy the new files into your CodeCommit repository directory, execute the following command in the terminal:
 
@@ -554,7 +552,6 @@ That concludes module 3.
 **Time to complete:** 40 minutes
 
 **Services used:**
-* AWS CloudFormation
 * Amazon Cognito
 * Amazon API Gateway
 * Amazon Simple Storage Service (S3)
@@ -563,45 +560,86 @@ That concludes module 3.
 
 ### Creating the API and User pool
 
-In order to add some more critical aspects to the Mythical Mysfits website, like allowing users to vote for their favorite mysfit and adopt a mysfit, we need to first have users register on the website.  To enable registration and authentication of website users, we will create a User Pool in AWS Cognito - a fully managed user identity management service.  Then, to make sure that only registered users are authorized to like or adopt mysfits on the website, we will deploy an API with Amazon API Gateway to sit in front of our network load balancer. Amazon API Gateway is also a managed service, and provides critical REST API capabilities out of the box like SSL termination, request authorization, request throttling, and much more.
-You will again use infrastructure as code through CloudFormation to deploy the needed resources to AWS. The CloudFormation template for this module is stored at `/module-4/cfn/service-with-apigw`. It contains the same resources as the previous Service CloudFormation templates with the following additions:
+In order to add some more critical aspects to the Mythical Mysfits website, like allowing users to vote for their favorite mysfit and adopt a mysfit, we need to first have users register on the website.  To enable registration and authentication of website users, we will create a **User Pool** in **AWS Cognito** - a fully managed user identity management service.  Then, to make sure that only registered users are authorized to like or adopt mysfits on the website, we will deploy an REST API with **Amazon API Gateway** to sit in front of our NLB. Amazon API Gateway is also a managed service, and provides commonly required REST API capabilities out of the box like SSL termination, request authorization, throttling, API stages and versioning, and much more.
 
-* The **Cognito User Pool** described above.
-* The **Amazon API Gateway REST API** described above.
-* An **Amazon API Gateway VPC Link** that enables APIs created with API Gateway to privately communicate with a service fronted by a Network Load Balancer like we deployed during this workshop.  **Note:** For the purposes of this workshop, we created the NLB to be internet-facing so that it could be called directly in earlier modules. Because of this, even though we will be requiring Authorization tokens in our API after this module, our NLB will still actually be open to the public behind the API Gateway API.  In a real-world scenario, you should create your NLB to be internal from the beginning, knowing that API Gateway would be your strategy for Internet-facing API authorization.
+You will again use the AWS CLI to deploy the needed resources to AWS.
 
-Another change to this CloudFormation template is that it uses the AWS **Serverless Application Model (SAM)** to define the new API. You can see this by looking at the second line of the template, where a Transform declaration is made.
+To create the **Cognito User Pool** where all of the Mythical Mysfits visitors will be stored, execute the following CLI command to create a user pool named *MysfitsUserPool* and indicate that all users who are registered with this pool should automatically have their email address verified via confirmation email before they become confirmed users.
+```
+aws cognito-idp create-user-pool --pool-name MysfitsUserPool --auto-verified-attributes email
+```
+Copy the response from the above command, which includes the unique ID for your user pool that you will need to use in later steps. Eg: `Id: us-east-1_ab12345YZ)`
+
+Next, in order to integrate our frontend website with Cognito, we must create a new **User Pool Client** for this user pool. This generates a unique client identifier that will allow our website to be authorized to call the unauthenticated APIs in cognito where website users can sign-in and register against the Mythical Mysfits user pool.  To create a new client using the AWS CLI for the above user pool, run the following command (replacing the `--user-pool-id` value with the one you copied above):
 
 ```
-Transform: AWS::Serverless-2016-10-31
+aws cognito-idp create-user-pool-client --user-pool-id REPLACE_ME --client-name MysfitsUserPoolClient
 ```
 
-SAM gives us the ability to simply define serverless resources like APIs and Lambda functions using simplified resource definitions in JSON or YAML.  SAM also provides additional capabilities related to the packaging and testing of Lambda functions, which you'll see later in Module 5. The Transformation declaration above tells CloudFormation that our template should be transformed using the specified version of SAM.  For this module, we'll use SAM to let us define our API in-line using a Swagger 2.0 definition.  
-In order to push this update out to the service stack in CloudFormation, we'll use a different command than before, called **deploy**.
+Next, let's turn our attention to creating a new RESTful API in front of our existing Flask service, so that we can perform request authorization before our NLB receives any requests.  We will do this with **Amazon API Gateway**, as described in the module overview.  In order for API Gateway to privately integrate with our NLB, we will configure an **API Gateway VPC Link** that enables API Gateway APIs to directly integrate with backend web services that are privately hosted inside a VPC. **Note:** For the purposes of this workshop, we created the NLB to be *internet-facing* so that it could be called directly in earlier modules. Because of this, even though we will be requiring Authorization tokens in our API after this module, our NLB will still actually be open to the public behind the API Gateway API.  In a real-world scenario, you should create your NLB to be *internal* from the beginning (or create a new internal load balancer to replace the existing one), knowing that API Gateway would be your strategy for Internet-facing API authorization.  But for the sake of time, we'll use the NLB that we've already created that will stay publicly accessible.
 
-This command will take the SAM template that we have created and transform it into typical CloudFormation, generate the **change set** to be applied to our stack (indicating which resources in the stack will be created, modified or deleted), then subsequently execute the changes to the stack using the same update-stack command we used in the last module.  To add the Cogntio User Pool and API Gateway API to our service stack run the following command in your terminal:
-
-```
-aws cloudformation deploy --stack-name MythicalMysfitsServiceStack --template-file ~/environment/aws-modern-application-workshop/module-4/cfn/service-with-apigw.yml
-```
-
-Once the stack has updated, run the following command to show the Output of the CloudFormation stack.  This latest version includes an Output of the REST API endpoint for your newly deployed API, as swell as additional outputs related to the Cognito UserPool and Cognito Client that have been created:
+Create the VPC Link for our upcoming REST API using the following CLI command (you will need to replace the indicated value with the ARN you saved when the NLB was created in module 2):
 
 ```
-aws cloudformation describe-stacks --stack-name MythicalMysfitsServiceStack
+aws apigateway create-vpc-link --name MysfitsApiVpcLink --target-arns REPLACE_ME
 ```
 
-Below is an example output you should find in the response to the above command for the ApiEndpoint:
+The response to the above will indicate that a new VPC link is being provisioned and is in `PENDING` state. Copy the indicated `id` for future use when we create our REST API in the next step.
 
 ```
 {
-    "Description": "The endpoint for the REST API created with API Gateway",
-    "OutputKey": "ApiEndpoint",
-    "OutputValue": "https://abcde12345.execute-api.us-east-1.amazonaws.com/prod"
+    "status": "PENDING",
+    "targetArns": [
+        "YOUR_ARN_HERE"
+    ],
+    "id": "abcdef1",
+    "name": "MysfitsApiVpcLink"
 }
 ```
 
-Copy the OutputValue listed for the OutputKeys of ApiEndpoint, UserPoolId, and UserPoolClientId and save them to a text editor or similar so that you can reference them in the final step of this module.
+With the VPC link creating, we can move on to create the actual REST API using Amazon API Gateway.  Your MythicalMysfits REST API is defined using **Swagger**, a popular open-source framework for describing APIs via JSON.  This Swagger definition of the API is located at `~/environment/aws-modern-applicaiton-workshop/module-4/aws-cli/api-swagger.json`.  Open this file and you'll see the REST API and all of its resources, methods, and configuration defined within.  
+
+There are several places within this JSON file that need to be updated to include parameters specific to your Cognito User Pool, as well as your Network Load Balancer.  
+
+The `securityDefinitions` object within the API definition indicates that we have setup an apiKey authorization mechanism using the Authorization header.  You will notice that AWS has provided custom extensions to Swagger using the prefix `x-amazon-api-gateway-`, these extensions are where API Gateway specific functionality can be added to typical swagger files to take advantage of API Gateway-specific capabilities.
+
+CTRL-F through the file to search for the various places `REPLACE_ME` is located and awaiting your specific parameters.  Once the edits have been made, save the file and execute the following AWS CLI command:
+
+```
+aws apigateway import-rest-api --parameters endpointConfigurationTypes=REGIONAL --body file://~/environment/aws-modern-application-workshop/module-4/aws-cli/api-swagger.json --fail-on-warnings
+```
+
+Copy the response this command returns and save the `id` value for the next step:
+
+```
+{
+    "name": "MysfitsApi",
+    "endpointConfiguration": {
+        "types": [
+            "REGIONAL"
+        ]
+    },
+    "id": "abcde12345",
+    "createdDate": 1529613528
+}
+```
+
+Now, our API has been created, but it's yet to be deployed anywhere. To deploy our API, we must first create a deployment and indicate which **stage** the deployment is fore.  A stage is a named reference to a deployment, which is a snapshot of the API. You use a Stage to manage and optimize a particular deployment. For example, you can set up stage settings to enable caching, customize request throttling, configure logging, define stage variables or attach a canary release for testing.  We will call our stage `prod`. To create a deployment for the prod stage, execute the following CLI command:
+
+```
+aws apigateway create-deployment --rest-api-id wmxn9hti3e --stage-name prod
+```
+
+With that, our REST API that's capable of user Authorization is deployed and available on the Internet... but where?!  Your API is available at the following location:
+
+```
+https://REPLACE_ME_WITH_API_ID.execute-api.REPLACE_ME_WITH_REGION.amazonaws.com/prod
+```
+
+Copy the above, replacing the appropriate values, and add `/mysfits` to the end of the URI.  Entered into a browser address bar, you should once again see your Mysfits JSON response.  But, we've added several capabilities like adopting and liking mysfits that our Flask service backend doesn't have implemented yet.
+
+Let's take care of that next.
+
 
 ### Updating Your Service Backend
 
@@ -627,7 +665,7 @@ git commit -m "Update service code backend to enable additional website features
 git push
 ```
 
-While those service updates are being automatically pushed through your CICD pipeline, continue on to the next step.
+While those service updates are being automatically pushed through your CI/CD pipeline, continue on to the next step.
 
 ### Editing and Publishing the Website
 
@@ -667,7 +705,7 @@ This concludes Module 4.
 ### Overview
 Now that your Mythical Mysfits site is up and running, let's create a way to better understand how users are interacting with the website and its Mysfits.  It would be very easy for us to analyze user actions taken on the website that lead to data changes in our backend - when mysfits are adopted or liked.  But understanding the actions your users are taking on the website *before* a decision to like or adopt a mysfit could help you design a better user experience in the future that leads to mysfits getting adopted even faster.  To help us gather these insights, we will implement the ability for the website frontend to submit a tiny request, each time a mysfit profile is clicked by a user, to a new microservice API we'll create. Those records will be processed in real-time by a serverless code function, aggregated, and stored for any future analysis that you may want to perform.
 
-Modern application design principles prefer focused, decoupled, and modular services.  So rather than add additional methods and capabilities within the existing Mysfits service that you have been working with so far, we will create a new and decoupled service for the purpose of receiving user click events from the Mysfits website. This approach to modular and decoupled microservices should not only apply to the services themselves, but also to infrastructure as code templates.  Infrastructure as code templates and application code repositories that are shared among many different service components can become just as unwieldy and complex as monolithic applications.  Rather than updating the existing service stack that you've been working with in the past few modules, you will create a new CloudFormation stack - this will allow all of the components that relate to the streaming stack to exist fully decoupled from the rest of the architecture you've created thus far.
+Modern application design principles prefer focused, decoupled, and modular services.  So rather than add additional methods and capabilities within the existing Mysfits service that you have been working with so far, we will create a new and decoupled service for the purpose of receiving user click events from the Mysfits website. This approach to modular and decoupled microservices should not only apply to the services themselves, but also to infrastructure as code templates.  Infrastructure as code templates and application code repositories that are shared among many different service components can become just as unwieldy and complex as monolithic applications.  Rather than updating the existing service stack that you've been working with in the past few modules, you will create a CloudFormation stack - this will allow all of the components that relate to the streaming stack to exist fully decoupled from the rest of the architecture you've created thus far.
 
 The serverless real-time processing service stack you are creating includes the following AWS resources:
 * An **AWS Kinesis Firehose delivery stream**: Kinesis Firehose is a managed real-time streaming service that accepts data records and automatically ingests them into several possible storage destinations within AWS, examples including an Amazon S3 bucket, or an Amazon Redshift data warehouse cluster. Kinesis Firehose also enables all of the records received by the stream to be automatically delivered to a serverless function created with **AWS Lambda** This means that code you've written can perform any additional processing or transformations of the records before they are aggregated and stored in the configured destination.
@@ -718,7 +756,7 @@ Now, we have the repository directory set with all of the provided artifacts:
 
 This is a common approach that AWS customers take - to store their CloudFormation templates alongside their application code in a repository. That way, you have a single place where all changes to application and it's environment can be tracked together.
 
-But, if you look at the code inside the `streamProcessor.py` file, you'll notice that it's using the `requests` Python package to make an API requset to the Mythical Mysfits service you created previously.  External libraries are not automatically included in the AWS Lambda runtime environment.  You will need to package all of your library dependencies together with your Lambda code function prior to it being uploaded to the Lambda service.  We will use the Python package manager `pip` to accomplish this.  In the Cloud9 terminal, run the following command to install the `requests` package and it's dependencies locally alongside your function code:
+But, if you look at the code inside the `streamProcessor.py` file, you'll notice that it's using the `requests` Python package to make an API requset to the Mythical Mysfits service you created previously.  External libraries are not automatically included in the AWS Lambda runtime environment, because different AWS customers may depend on different versions of various libraries, etc.  You will need to package all of your library dependencies together with your Lambda code function prior to it being uploaded to the Lambda service.  We will use the Python package manager `pip` to accomplish this.  In the Cloud9 terminal, run the following command to install the `requests` package and it's dependencies locally alongside your function code:
 
 ```
 pip install requests -t .
@@ -753,7 +791,7 @@ With that line changed in the Python file, and our code committed, we are ready 
 First, use the AWS CLI to create a new S3 bucket where our Lambda function code packages will be uploaded to.  S3 bucket names need to be globally unique among all AWS customers, so replace the end of this bucket name with a string that's unique to you:
 
 ```
-aws s3 mb s3://mythical-mysfits-streaming-code-uniquestringhere/
+aws s3 mb s3://mythical-mysfits-streaming-code-bucket-name/
 ```
 
 With our bucket created, we are ready to use the SAM CLI to package and upload our code and transform the CloudFormation template, be sure to replace the last command parameter with the bucket name you just created above (this command also assumes your terminal is still in the repository working directory):
@@ -779,13 +817,9 @@ With the streaming stack up and running, we now need to publish a new version of
 
 The new index.html file is included at: `~/environment/aws-modern-application-workshop/module-5/app/web/index.html`
 
-This file contains the same placeholders as module-4 that need to be updated, as well as an additional placeholder for the new stream processing service endpoint you just created.  For the previous variable values, you can either refer to the previous `index.html` file you updated as part of module-4, or refer back to the AWS CloudFormation Stack created as part of module-4:
+This file contains the same placeholders as module-4 that need to be updated, as well as an additional placeholder for the new stream processing service endpoint you just created.  For the previous variable values, you can refer to the previous `index.html` file you updated as part of module-4.
 
-```
-aws cloudformation describe-stacks --stack-name MythicalMysfitsServiceStack
-```
-
-Perform the same command for the new streaming stack to retreieve the new API Gateway endpoint for your stream processing serivce:
+Perform the following command for the new streaming stack to retrieve the new API Gateway endpoint for your stream processing service:
 
 ```
 aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingStack
@@ -805,18 +839,33 @@ Now that you have a completed modern application architecture, we encourage you 
 
 
 ### Workshop Clean-Up
-Our use of CloudFormation makes cleanup of your workshop artifacts easy, you simply need to delete the stacks created during the workshop, and all of the resources we've created will be deleted.  *However*, there are some resources that CloudFormation will not programmatically delete if they still contain other created resources - in our case this includes S3 buckets, and our Elastic Container Registry repositories.
-Navigate to the S3 console and delete any buckets created there, and the ECS console to delete the created repositories.  Also keep in mind that we created our Lambda function code package without the use of CloudFormation, so it should be deleted by hand in the Console as well.
+Be sure to delete all of the resources created during the workshop in order to ensure that billing for the resources does not continue for longer than you intend.  We reccomend that you utilize the AWS Console to explore the resources you've created and delete them when you're ready.  
 
-Once that is completed, you can delete the other CloudFormation stacks we've created. Because some of our created stacks have dependencies on previous stacks that you created, you should delete them in **reverse order** of how they were created (StreamingStack -> ServiceStack -> CICDStack -> CoreStack) using either the CloudFormation Console, or the following CLI command for each:
+For the two cases where you provisioned resources using AWS CloudFormation, you can remove those resources by simply running the following CLI command for each stack:
 
 ```
 aws cloudformation delete-stack --stack-name STACK-NAME-HERE
 ```
 
+To remove all of the created resources, you can visit the following AWS Consoles, which contain resources you've created during the MYthical Mysfits workshop:
+* [AWS Kinesis](https://console.aws.amazon.com/kinesis/home)
+* [AWS Lambda](https://console.aws.amazon.com/lambda/home)
+* [Amazon S3](https://console.aws.amazon.com/s3/home)
+* [Amazon API Gateway](https://console.aws.amazon.com/apigateway/home)
+* [Amazon Cognito](https://console.aws.amazon.com/cognito/home)
+* [AWS CodePipeline](https://console.aws.amazon.com/codepipeline/home)
+* [AWS CodeBuild](https://console.aws.amazon.com/codebuild/home)
+* [AWS CodeCommit](https://console.aws.amazon.com/codecommit/home)
+* [Amazon DynamoDB](https://console.aws.amazon.com/dynamodb/home)
+* [Amazon ECS](https://console.aws.amazon.com/ecs/home)
+* [Amazon EC2](https://console.aws.amazon.com/ec2/home)
+* [Amazon VPC](https://console.aws.amazon.com/vpc/home)
+* [AWS IAM](https://console.aws.amazon.com/iam/home)
+* [AWS CloudFormation](https://console.aws.amazon.com/cloudformation/home)
+
 # Conclusion
 
-This experience was meant to give you a taste of what it's like to be a developer designing and building modern application architectures on top of AWS.  Developers on AWS are able to programmatically provision and reuse infrastructure definitions via AWS CloudFormation, automatically build and deploy code changes using the AWS developer tool suite of Code services, and take advantage of multiple different compute and appliation service capabilities that do not require you to provision or manage any servers at all!
+This experience was meant to give you a taste of what it's like to be a developer designing and building modern application architectures on top of AWS.  Developers on AWS are able to programmatically provision resources using the AWS CLI, reuse infrastructure definitions via AWS CloudFormation, automatically build and deploy code changes using the AWS developer tool suite of Code services, and take advantage of multiple different compute and application service capabilities that do not require you to provision or manage any servers at all!
 
 As a great next step, to learn more about the inner workings of the Mythical Mysfits website that you've created, dive into the provided CloudFormation templates and the resources declared within them.
 
