@@ -1,0 +1,69 @@
+{
+  "TableName": "MysfitsTable",
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 5,
+    "WriteCapacityUnits": 5
+  },
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "MysfitId",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "Alignment",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "Species",
+      "AttributeType": "S"
+    }
+  ],
+  "KeySchema": [
+    {
+      "AttributeName": "MysfitId",
+      "KeyType": "HASH"
+    }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "SpeciesIndex",
+      "KeySchema": [
+        {
+          "AttributeName": "Species",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "MysfitId",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 5,
+        "WriteCapacityUnits": 5
+      }
+    },
+    {
+      "IndexName": "AlignmentIndex",
+      "KeySchema": [
+        {
+          "AttributeName": "Alignment",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "MysfitId",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 5,
+        "WriteCapacityUnits": 5
+      }
+    }
+  ]
+}
