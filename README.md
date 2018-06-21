@@ -57,3 +57,6 @@ To remove all of the created resources, you can visit the following AWS Consoles
 * [Amazon VPC](https://console.aws.amazon.com/vpc/home)
 * [AWS IAM](https://console.aws.amazon.com/iam/home)
 * [AWS CloudFormation](https://console.aws.amazon.com/cloudformation/home)
+
+
+[Proceed to Module 1](/module-1)
