@@ -125,7 +125,7 @@ Now, open up your favorite web browser and enter the below into the address bar.
 
 http://YOUR_BUCKET_NAME.s3-website-YOUR_REGION.amazonaws.com
 
-[TODO include image of website]
+![mysfits-welcome](/images/module-1/mysfits-welcome.png)
 
 Congratulations, you have created the basic static Mythical Mysfits Website!
 
@@ -393,7 +393,7 @@ We have one final step before our CICD pipeline can execute end-to-end successfu
 
 When that has been created successfully, you have a working end-to-end CICD pipeline to deliver code changes automatically to your service in ECS.
 
-To test this out, we need to configure git within your Cloud9 IDE and integrate it with your CodeCommit repository.
+To test out the new pipeline, we need to configure git within your Cloud9 IDE and integrate it with your CodeCommit repository.
 
 AWS CodeCommit provides a credential helper for git that we will use to make integration easy.  Run the following commands in sequence the terminal to configure git to be used with AWS CodeCommit (neither will report any response if successful):
 
