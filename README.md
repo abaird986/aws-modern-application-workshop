@@ -26,9 +26,7 @@ This sample application will use many different AWS services and features that m
 
 The Mythical Mysfits website serves it's static content directly from Amazon S3, provides a microservice API backend deployed as a container through AWS Fargate on Amazon ECS, stores data in a managed NoSQL database provided by Amazon DynamoDB, with authentication and authorization for the application enabled through AWS API Gateway and it's integration with Amazon Cognito.  The user website clicks will be sent as records to an Amazon Kinesis Firehose Delivery stream where those records will be processed by serverless AWS Lambda functions and then stored in Amazon S3.
 
-You will be creating and deploying changes to this application completely programmatically.  We have provided AWS CloudFormation templates that define the required infrastructure components as code, which includes a fully managed CI/CD stack utilizing AWS CodeCommit, CodeBuild, and CodePipeline.  Finally, you will complete the development tasks required all within your own browser by leveraging the cloud-based IDE, AWS Cloud9.
-
-So, you will not be manually creating each individual resource inside AWS, completed CloudFormation templates will instead do that work for you.  In order to dive deeper into the service and their features that the Mythical Mysfits website uses, you should review these CloudFormation templates as needed. CloudFormation allows AWS developers to declaratively define their full AWS environments as JSON or YAML files. So all of the required features and services that your application will use are there for you to see and review inside the provided templates.
+You will be creating and deploying changes to this application completely programmatically. You will use the AWS Command Line Interface to execute commands that create the required infrastructure components, which includes a fully managed CI/CD stack utilizing AWS CodeCommit, CodeBuild, and CodePipeline.  Finally, you will complete the development tasks required all within your own browser by leveraging the cloud-based IDE, AWS Cloud9.
 
 # Module 1: IDE Setup and Static Website Hosting
 
@@ -95,49 +93,43 @@ In the terminal, change directory to the newly cloned repository directory:
 cd aws-modern-application-workshop
 ```
 
-Next, we will create the infrastructure components needed for hosting a static website in Amazon S3 via AWS CloudFormation.  In the cloned repository, we have included a CloudFormation template that can create the Amazon S3 bucket required, as well as configure it to be usable for static website hosting.  To create the stack represented by the CloudFormation template, run the following CloudFormation command via the AWS Command Line Interface:
+Next, we will create the infrastructure components needed for hosting a static website in Amazon S3 via the AWS CLI.  
+
+First, create an S3 bucket, replace the name below (mythical-mysfits-bucket-name) with your own unique bucket name.  Copy the name you choose and save it for later, as you will use it in several other places during this workshop:
 
 ```
-aws cloudformation create-stack --stack-name MythicalMysfitsWebsiteBucket --template-body file://~/environment/aws-modern-application-workshop/module-1/cfn/s3-website.yml
+aws s3 mb s3://mythical-mysfits-bucket-name
 ```
 
-The output of this command will indicate a new stack is being created by CloudFormation with the StackId in the response:
+Now that we have created a bucket, we need to set some configuration options that enable the bucket to be used for static website hosting.  This configuration enables the objects in the bucket to be requested using a registered public DNS name for the bucket, as well as direct site requests to the base path of the DNS name to a selected website homepage (index.html in most cases):
 
 ```
-{
-    "StackId": "arn:aws:cloudformation:us-east-1:xxxx:stack/MythicalMysfitsWebsiteBucket/xxxx"
-}
+aws s3 website s3://YOUR_BUCKET_NAME --index-document index.html
 ```
 
-You can either visit the CloudFormation console to view the creation status of your stack, or execute the following CLI command:
+All buckets created in Amazon S3 are fully private by default.  In order to be used as a public website, we need to create an S3 **Bucket Policy** that indicates objects stored within this new bucket may be publicly accessed by anyone. Bucket policies are represented as JSON documents that define the S3 *Actions* (S3 API calls) that are allowed (or not not allowed) to be performed by different *Principals* (in our case the public, or anyone). The JSON document for the necessary bucket policy is located at: `/~/environment/aws-modern-application-workshop/module-1/aws-cli/bucket-policy.json`.  This file includes several places that you need to change to use the new bucket name you've created (indicated with `REPLACE_ME`).
+
+Execute the following CLI command to add a public bucket policy to your website:
 
 ```
-aws cloudformation describe-stacks --stack-name MythicalMysfitsWebsiteBucket
+aws s3api put-bucket-policy --bucket mythical-mysfits-bucket-name --policy file://~/environment/aws-modern-application-workshop/module-1/aws-cli/website-bucket-policy.json
 ```
 
-When you see the StackStatus of “CREATE_COMPLETE”, your S3 bucket has been created.  Find the “Outputs” object within the response to find the HTTPS URL that you can use to access your new website, save this for reference.  Also, within the URL you can find the name of the S3 bucket that has been created.  Save this for reference as well, the section between the arrows below represents your bucket name that can be found within the Output S3BucketSecureURL:
+Now that our new website bucket is configured appropriately, let's add the first iteration of the Mythical Mysfits homepage to the bucket.  Use the following S3 CLI command that mimics the linux command for copying files (**cp**) to copy the provided index.html page locally from your IDE up to the new S3 bucket (replacing the bucket name appropriately).
 
 ```
-{
-    "Description": "Name of S3 bucket to hold website content",
-    "OutputKey": "S3BucketSecureURL",
-    "OutputValue": "https://-->mythicalmysfitswebsitebucket-s3bucket-xxxxx<---.amazonaws.com"
-}
+aws s3 cp ~/environment/aws-modern-application-workshop/module-1/web/index.html s3://YOUR_BUCKET_NAME/index.html
 ```
 
+Now, open up your favorite web browser and enter the below into the address bar. The string to replace YOUR_REGION should match whichever region you created, the possible region strings are listed above at the beginning of this modules instructions (eg: us-east-1):
 
-Now we need to copy the first version of Mythical Mysfits homepage to the bucket.  This is included as an index.html file within the /module-1/web/ directory of the repository you cloned.  We will accomplish this using the AWS CLI using the following command, which will use the S3 bucket name that you save from above (the bolded component):
-
-```
-aws s3 cp ./module-1/web/index.html s3://mythicalmysfitswebsitebucket-s3bucket-xxxx/index.html
-```
-
-Now, if you visit the full URL saved earlier, you can see that the initial Mythical Mysfits website is up and running!
+http://YOUR_BUCKET_NAME.s3-website-YOUR_REGION.amazonaws.com
 
 [TODO include image of website]
 
-That concludes Module 1.
+Congratulations, you have created the basic static Mythical Mysfits Website!
 
+That concludes Module 1.
 
 # Module 2: Creating a Service with AWS Fargate
 
@@ -148,7 +140,8 @@ That concludes Module 1.
 * AWS Identity and Access Management (IAM)
 * Amazon Virtual Private Cloud (VPC)
 * Amazon Elastic Load Balancing
-* Amazon Elastic Container Service (ECS) with AWS Fargate
+* Amazon Elastic Container Service (ECS)
+* AWS Fargate
 * AWS Elastic Container Registry (ECR)
 * AWS CodeCommit
 * AWS CodePipeline
@@ -158,18 +151,17 @@ That concludes Module 1.
 
 ### Overview
 
-In Module 2, you will create a new microservice hosted with AWS Fargate on Amazon Elastic Container Service so that your Mythical Mysfits website can have a application backend to integrate with. AWS Fargate is a feature of Amazon ECS that allows you to deploy containers without having to manage any clusters or servers. For our Mythical Mysfits backend, we will use Python and create a Flask app in a Docker container behind a Network Load Balancer. These will form the microservice backend for the frontend website to integrate with.
+In Module 2, you will create a new microservice hosted with AWS Fargate on Amazon Elastic Container Service so that your Mythical Mysfits website can have a application backend to integrate with. AWS Fargate is a deployment option in Amazon ECS that allows you to deploy containers without having to manage any clusters or servers. For our Mythical Mysfits backend, we will use Python and create a Flask app in a Docker container behind a Network Load Balancer. These will form the microservice backend for the frontend website to integrate with.
 
 ### Creating the Core Infrastructure
 
-Before we can create our service, we need to create the core infrastructure environment that the service will use, including the networking infrastructure in Amazon VPC, and the AWS Identity and Access Management Roles that will define the permissions that ECS and our containers will have on top of AWS.  It is common on many teams to have separate teams with elevated access in AWS that are responsible for creating and modifying Network and Security resources. We have followed that model here to demonstrate how CloudFormation can help enforce separation of duties on AWS for your team through modular templates.  We have provided a CloudFormation template to create all of the necessary Network and Security resources in /module-2/cfn/core.yml.  This template will create the following resources:
+Before we can create our service, we need to create the core infrastructure environment that the service will use, including the networking infrastructure in Amazon VPC, and the AWS Identity and Access Management Roles that will define the permissions that ECS and our containers will have on top of AWS.  We will use AWS CloudFormation to accomplish this. AWS CloudFormation is a service that can programmatically provision AWS resources that you declare within JSON or YAML files called *CloudFormation Templates*, enabling the common best practice of *Infrastructure as Code*.  We have provided a CloudFormation template to create all of the necessary Network and Security resources in /module-2/cfn/core.yml.  This template will create the following resources:
 
 * **An Amazon VPC** - a network environment that contains four subnets (two public and two private) in the 10.0.0.0/16 private IP space, as well as all the needed Route Table configurations.
 * **Two NAT Gateways** (one for each public subnet) - allows the containers we will eventually deploy into our private subnets to communicate out to the Internet to download necessary packages, etc.
 * **A DynamoDB Endpoint** - our microservice backend will eventually integrate with Amazon DynamoDB for persistence (as part of module 3).
-* **A Network Load Balancer** - A high throughput and low latency TCP load balancer that will route requests from the Internet to your service containers.
 * **A Security Group** - Allows your docker containers to receive traffic on port 8080 from the Internet through the Network Load Balancer.
-* **Two IAM Roles** - Two Identity and Access Management Roles are created. One for the Amazon ECS service that allow it to interact with the infrastructure environment as needed. Another that will provide your docker containers with the permissions they require for interacting with AWS services like DynamoDB and CloudWatch Logs.
+* **IAM Roles** - Identity and Access Management Roles are created. These will be used throughout the workshop to give AWS services or resources you create access to other AWS services like DynamoDB, S3, and more.
 
 To create these resources, run the following command in the Cloud9 terminal (will take ~10 minutes for stack to be created):
 
@@ -177,11 +169,14 @@ To create these resources, run the following command in the Cloud9 terminal (wil
 aws cloudformation create-stack --stack-name MythicalMysfitsCoreStack --capabilities CAPABILITY_IAM --template-body file://~/environment/aws-modern-application-workshop/module-2/cfn/core.yml   
 ```
 
-Remember you can check on the status of your stack creation either via the AWS Console or by running the command:
+You can check on the status of your stack creation either via the AWS Console or by running the command:
 
 ```
 aws cloudformation describe-stacks --stack-name MythicalMysfitsCoreStack
 ```
+When in the `describe-stacks` response, you see a status of `CREATE_COMPLETE`, CloudFormation has finished provisioning all of the core networking and security resources described above.
+
+Once you see `CREATE_COMPLETE` in the `describe-stacks` response command above, copy the full response and save it for future reference in a text editor. Or, create a temporary folder and file to save it to within your IDE. This JSON response contains the unique identifiers for several of the created resources, which we will use later in this workshop.  
 
 ### Creating your First Docker Image
 
@@ -232,7 +227,7 @@ This will open another panel in the IDE where the web browser will be available.
 
 If successful you will see a response from the service that returns the JSON document stored at `/aws-modern-application-workshop/module-2/app/service/mysfits-response.json`
 
-With a successful test of our service locally, we're ready to create a container image repository in Amazon ECR and push our image into it.  In order to create the registry, run the following command, this creates a new repository in the default AWS ECR registry created for your account.
+With a successful test of our service locally, we're ready to create a container image repository in Amazon Elastic Container Registry (Amazon ECR) and push our image into it.  In order to create the registry, run the following command, this creates a new repository in the default AWS ECR registry created for your account.
 
 ```
 aws ecr create-repository --repository-name mythicalmysfits/service
@@ -245,7 +240,7 @@ In order to push container images into our new repository, we will need to obtai
 $(aws ecr get-login --no-include-email)
 ```
 
-Next, push the image you created to the Amazon ECR repository using the copied tag from above. Using this command, docker will push your image and all the images it depends on to Amazon ECR:
+Next, push the image you created to the ECR repository using the copied tag from above. Using this command, docker will push your image and all the images it depends on to Amazon ECR:
 
 ```
 docker push 111111111111.dkr.ecr.us-east-1.amazonaws.com/mythicalmysfits/service:latest
@@ -259,40 +254,70 @@ aws ecr describe-images --repository-name mythicalmysfits/service
 
 ### Creating your first Fargate Service
 
-Now,  we have an image available in ECR that we can deploy to a service hosted on Amazon ECS using AWS Fargate.  The same service you tested locally via the terminal in Cloud9 as part of the last module will now be deployed in the cloud and publicly available behind a Network Load Balancer.  We have provided a CloudFormation template to accomplish this, representing all of the infrastructure you need as code.  This CloudFormation template will create the following resources:
+Now,  we have an image available in ECR that we can deploy to a service hosted on Amazon ECS using AWS Fargate.  The same service you tested locally via the terminal in Cloud9 as part of the last module will now be deployed in the cloud and publicly available behind a Network Load Balancer.  
 
-* **An ECS Cluster**: The cluster of “servers” that your service containers will be deployed to.  Servers is in quotations here because you will in fact be using AWS Fargate, which allows you to specify that your containers be deployed to a cluster without having to actually provision or manage any servers yourself.
-* **An AWS CloudWatch Logs Group**: The logs that your container generates will automatically be pushed to AWS CloudWatch logs as part of this group. Especially important when using AWS Fargate since you will not have access to the server infrastructure where your containers are running.
-* **An ECS Task Definition** A Task in ECS defines one or more containers that are deployed together to a cluster and the resources and configuration options that those containers require to run.  The container included in this task definition is the image that we pushed into ECR as part of the last module.
-* **An ECS Service** The service itself.  Here we define that the Task above will be what is deployed and run as the service, that the Tasks should be deployed to Fargate so that they may be run serverless, indicate that this service and it's containers should be registered to the network load balancer and allow the traffic we permitted in the Security Groups created with the core.yml CloudFormation template used in Module 2A.
+First, we will create a **Cluster** in the **Amazon Elastic Container Service (ECS)**. This represents the cluster of “servers” that your service containers will be deployed to.  Servers is in "quotations" because you will be using **AWS Fargate**. Fargate allows you to specify that your containers be deployed to a cluster without having to actually provision or manage any servers yourself.
 
-To create these resources using the CloudFormation template included, run the following command in the Cloud9 terminal:
+To create a new cluster in ECS, run the following command:
 
 ```
-aws cloudformation create-stack --stack-name MythicalMysfitsServiceStack --template-body file://~/environment/aws-modern-application-workshop/module-2/cfn/service.yml
+aws ecs create-cluster --cluster-name MythicalMysfits-Cluster
 ```
 
-Once the stack has been created, let's try sending a request to the network load balancer (NLB) to confirm our service is up and available.  To find the URL of the NLB, execute the following command in the terminal to see the outputs we have configured in the MythicalMysfitsCoreStack we created earlier with CloudFormation:
+Next, we will create a new log group in **AWS CloudWatch Logs**.  AWS CloudWatch Logs is a service for log collection and analysis. The logs that your container generates will automatically be pushed to AWS CloudWatch logs as part of this specific group. This is especially important when using AWS Fargate since you will not have access to the server infrastructure where your containers are running.
+
+To create the new log group in CloudWatch logs, run the following command:
 
 ```
-aws cloudformation describe-stacks --stack-name MythicalMysfitsCoreStack
+aws logs create-log-group --log-group-name mythicalmysfits-logs
 ```
 
-In the response JSON, you will see an Output listed called “ExternalUrl”, whose OutputValue is the URL to be used to send a request to the created NLB.  See below:
+Now that we have a cluster created and a log group defined for where our container logs will be pushed to, we're ready to register an ECS **task definition**.  A task in ECS is a set of container images that should be scheduled together. A task definition declares that set of containers and the resources and configuration those containers require.  You will use the AWS CLI to create a new task definition for how your new container image should be scheduled to the ECS cluster we just created.  
+
+A JSON file has been provided that will serve as the input to the CLI command, stored at `~/environment/aws-modern-application-workshop/module-2/aws-cli/task-definition.json`. Open this file in the IDE and replace the indicated values with the appropriate ones from your created resources.  These values with be pulled from the CloudFormation response you copied earlier as well as the docker image tag that you pushed earlier to ECR, eg: `111111111111.dkr.ecr.us-east-1.amazonaws.com/mythicalmysfits/service:latest`
+
+Once you have replaced the values in `task-defintion.json` and saved it. Execute the following command to register a new task definition in ECS:
 
 ```
-{
-  "Description": "The url of the external load balancer",
-  "ExportName": "MythicalMysfitsCoreStack:ExternalUrl",
-  "OutputKey": "ExternalUrl",
-  "OutputValue": "http://Mythi-Publi-123456789-abc123456.elb.us-east-1.amazonaws.com"
-}
+aws ecs register-task-definition --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/task-definition.json
 ```
 
-Let's copy that URL and send a request to it using the preview browser (or by simply any web browser, since this time our service is available on the Internet with the retrieved URL):
+With a new task definition registered, we're ready to provision the infrastructure needed in our service stack. Rather than directly expose our service to the Internet, we will provision a **Network Load Balancer (NLB)** to sit in front of our service tier.  This would enable our frontend website code to communicate with a single DNS name while our backend service would be free to elastically scale in-and-out based on demand or if failures occur and new containers need to be provisioned.
+
+To provision a new NLB, execute the following CLI command in the Cloud9 terminal:
 
 ```
-http://Mythi-Publi-123456789-abc123456.elb.us-east-1.amazonaws.com/mysfits
+aws elbv2 create-load-balancer --name mysfits-nlb --scheme internet-facing --type network --subnets subnet-0c7ca350 subnet-1f895078
+```
+
+Copy the response provided by this command, which contains the DNS name of the provisioned NLB as well as its ARN.  You will use this DNS name to test the service once it has been deployed.  And the ARN will be used in a future step.
+
+Next, use the CLI to create an NLB **target group**. A target group allows AWS resources to register themselves as targets for requests that the load balancer receives to forward.  Our service containers will automatically register to this target so that they can receive traffic from the NLB when they are provisioned. This command includes one value that will need to be replaced, your `vpc-id` which can be found as a value within the earlier saved `MythicalMysfitsCoreStack` output returned by CloudFormation.
+
+```
+aws elbv2 create-target-group --name MythicalMysfits-TargetGroup --port 8080 --protocol TCP --target-type ip --vpc-id REPLACE_ME --health-check-interval-seconds 10 --health-check-path / --health-check-protocol HTTP --healthy-threshold-count 3 --unhealthy-threshold-count 3
+```
+
+Copy and save the response from the above command as well, which contains the Target Group ARN to be used in the next step.
+
+Next, use the CLI to create a load balancing **listener** for the NLB.  This informs that load balancer that for requests received on a specific port, they should be forwarded to targets that have registered to the above target group. Be sure to replace the two indicated values with the appropriate ARN from the TargetGroup and the NLB that you saved from the previous steps:
+
+```
+aws elbv2 create-listener --default-actions TargetGroupArn=REPLACE_ME,Type=forward --load-balancer-arn REPLACE_ME --port 80 --protocol TCP
+```
+
+With the NLB created and configured, we're ready to create the actual ECS **service** where our containers will run and register themselves to the load balancer to receive traffic.  We have included a JSON file for the CLI input that is located at: `~/environment/aws-modern-application-workshop/module-2/aws-cli/service-definition.json`.  This file includes all of the configuration details for the service to be created, including indicating that this service should be launched with **AWS Fargate** - which means that you do not have to provision any servers within the targeted cluster.  The containers that are scheduled as part of the task used in this service will run on top of a cluster that is fully managed by AWS.
+
+Open this file and replace the indicated values of `REPLACE_ME` and save it, then run the following command to create the service:
+
+```
+aws ecs create-service --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/service-definition.json
+```
+
+After your service is created, ECS will provision a new task that's running the container you've pushed to ECR, and register it to the created NLB.  Copy that URL and send a request to it using the preview browser (or by simply any web browser, since this time our service is available on the Internet with the retrieved DNS name). Try sending a request to the mysfits resource:
+
+```
+http://mysfits-nlb-123456789-abc123456.elb.us-east-1.amazonaws.com/mysfits
 ```
 
 A response showing the same JSON response we received earlier when testing the docker container locally in Cloud9 means your Flask API is up and running on AWS Fargate.
@@ -319,34 +344,61 @@ aws s3 cp ~/environment/aws-modern-application-workshop/module-2/web/index.html 
 
 Now that you have a service up and running, you may think of code changes that you'd like to make to your Flask service.  It would be a bottleneck for your development speed if you had to go through all of the same steps above every time you wanted to deploy a new feature to your service. That's where Continuous Integration and Continuous Delivery or CI/CD come in!
 
-In this module, you will create a fully managed CI/CD stack that will automatically deliver all of the code changes that you make to your code base to the service you created during the last module.  To help you accomplish this, we have included another CloudFormation template that will create the following resources for you:
+In this module, you will create a fully managed CI/CD stack that will automatically deliver all of the code changes that you make to your code base to the service you created during the last module.  
 
-* **An AWS CodeCommit Repository**: A fully managed and private Git repository where your code will be stored.
-* **An AWS CodeBuild Project**: Will automatically provision a build server to our configuration and execute the steps required to build our docker image and push a new version of it to the ECR repository we created.  These steps are included in the `/module-3/app/buildspec.yml` file.  The **buildspec.yml** file is what you create to instruct CodeBuild what steps are required for a build execution within the service.
-* **An Amazon ECR Repository***: We will recreate the repository you created by through the command line during the last module so that all of the pieces of our CI/CD stack can be represented by the same CloudFormation template.
-* An AWS CodePipeline Pipeline: Orchestrates the entire CI/CD process from beginning to end.  Detects when changes are pushed into our CodeCommit repository, triggers a build to occur for those changes in our CodeBuild project, and then takes those completed changes and deploys them to the ECS service we created above in Module 2.
-* IAM Roles - IAM roles required for the services above to execute within your account with the required permissions.
-
-First, let's delete the repository you created by hand during the last module so that CloudFormation can create it anew as part of this holistic CI/CD stack.  Run the following in the terminal:
+First, you'll need a place to push and store your code in. Create an **AWS CodeCommit Repository** using the CLI for this purpose:
 
 ```
-aws ecr delete-repository —-repository-name mythicalmysfits/service -—force
+aws codecommit create-repository --repository-name MythicalMysfitsService-Repository
 ```
 
-**Note:** In a real-world scenario, you would more typically create this CI/CD stack as development begins and then create the service stack once you need to first deploy the code you've written.  But, for this workshop we had you create the service first to become familiar with its concepts before deploying to it with automation.
-
-To use CloudFormation to create the CI/CD stack for your Mythical Mysfits service, run the following command in the terminal:
+Next, we need to create another S3 bucket that will be used to store the temporary artifacts that are created in the middle of our CICD pipeline executions.  Choose a new bucket name for these artifacts and create one using the following CLI command:
 
 ```
-aws cloudformation create-stack --stack-name MythicalMysfitsCICDStack --capabilities CAPABILITY_NAMED_IAM --template-body file://~/environment/aws-modern-application-workshop/module-2/cfn/devtools.yml
+aws s3 mb s3://mythical-mysfits-artifacts-bucket-name
 ```
 
-When that stack has been created successfully, we first must integrate our Cloud9 IDE with the new CodeCommit code repository that was just created.
+Next, this bucket needs a bucket policy to define permissions for the data stored within it. But unlike our website bucket that allowed access to anyone, only our CICD pipeline should have access to this bucket.  We have provided the JSON file needed for this policy at `~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json`.  Open this file, and inside you will need to replace several strings to include the ARNs that were created as part of the MythicalMysfitsCoreStack earlier, as well as your newly chosen bucket name for your CICD artifacts.
 
-First, we need to generate git credentials to interact with the created repository. AWS CodeCommit provides a credential helper for git that we will use to make integration easy.  Run the following commands in sequence the terminal (neither will report any response if successful):
+Once you've modified and saved this file, execute the following command to grant access to this bucket to your CICD pipeline:
 
 ```
-git config --global user.name "*Your Name*"
+aws s3api put-bucket-policy --bucket mythical-mysfits-artifacts-bucket-name --policy file://~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json
+```
+
+With a repository to store our code in, and an S3 bucket that will be used for our CICD artifacts, lets add to the CICD stack with a way for a service build to occur.  This will be accomplished by creating an **AWS CodeBuild Project**.  Any time a build execution is triggered, AWS CodeBuild will automatically provision a build server to our configuration and execute the steps required to build our docker image and push a new version of it to the ECR repository we created (and then spin the server down when the build is completed).  The steps for our build (which package our Python code and build/push the Docker container) are included in the `~/environment/aws-modern-application-workshop/module-2/app/buildspec.yml` file.  The **buildspec.yml** file is what you create to instruct CodeBuild what steps are required for a build execution within a CodeBuild project.
+
+To create the CodeBuild project, another CLI input file is required to be updated with parameters specific to your resources. It is located at `~/environment/aws-modern-application-workshop/module-2/aws-cli/code-build-project.json`.  Similarly replace the values within this file as you have done before from the MythicalMysfitsCoreStackOutput. Once saved, execute the following with the CLI to create the project:
+
+```
+aws codebuild create-project --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-build-project.json
+```
+
+Finally, we need a way to *continuously integrate* our CodeCommit repository with our CodeBuild project so that builds will automatically occur whenever a code change is pushed to the repository.  Then, we need a way to *continuously deliver* those newly built artifacts to our service in ECS.  **AWS CodePipeline** is the service that glues these actions together in a **pipeline** you will create next.  
+
+Your pipeline in CodePipeline will do just what I described above.  Anytime a code change is pushed into your CodeCommit repository, CodePipeline will deliver the latest code to your AWS CodeBuild project so that a build will occur. When successfully built by CodeBuild, CodePipeline will perform a deployment to ECS using the latest container image that the CodeBuild execution pushed into ECR.
+
+All of these steps are defined in a JSON file provided that you will use as the input into the AWS CLI to create the pipeline. This file is located at `~/environment/aws-modern-application-workshop/module-2/aws-cli/code-pipeline.json`, open it and replace the required attributes within, and save the file.
+
+Once saved, create a pipeline in CodePipeline with the following command:
+
+```
+aws codepipeline create-pipeline --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-pipeline.json
+```
+
+We have one final step before our CICD pipeline can execute end-to-end successfully. With a CICD pipeline in place, you won't be manually pushing container images into ECR anymore.  CodeBuild will be pushing new images now. We need to give CodeBuild permission to perform actions on your image repository with an **ECR repository policy***.  The policy document needs to be updated with the specific ARN for the CodeBuild role created by the MythicalMysfitsCoreStack, and the policy document is located at `~/environment/aws-modern-application-workshop/module-2/aws-cli/ecr-policy.json`.  Update and save this file and then run the following command to create the policy:
+
+```aws ecr set-repository-policy --repository-name mythicalmysfits/service --policy-text file://~/environment/aws-modern-application-workshop/module-2/aws-cli/ecr-policy.json
+```
+
+When that has been created successfully, you have a working end-to-end CICD pipeline to deliver code changes automatically to your service in ECS.
+
+To test this out, we need to configure git within your Cloud9 IDE and integrate it with your CodeCommit repository.
+
+AWS CodeCommit provides a credential helper for git that we will use to make integration easy.  Run the following commands in sequence the terminal to configure git to be used with AWS CodeCommit (neither will report any response if successful):
+
+```
+git config --global user.name "YOUR_NAME"
 ```
 
 ```
@@ -367,10 +419,10 @@ Next change directories in your IDE to the environment directory using the termi
 cd ~/environment/
 ```
 
-Now, we are ready to clone our repository using the following terminal command (be sure to replace us-east-1 with the region you are using for the workshop, if needed):
+Now, we are ready to clone our repository using the following terminal command:
 
 ```
-git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/MythicalMysfitsService-Repository
+git clone https://git-codecommit.REPLACE_REGION.amazonaws.com/v1/repos/MythicalMysfitsService-Repository
 ```
 
 This will tell us that our repository is empty!  Let's fix that by copying the application files into our repository directory using the following command:
