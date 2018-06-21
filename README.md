@@ -1,5 +1,7 @@
 # Build a Modern Application on AWS (Python)
 
+![mysfits-welcome](/images/module-1/mysfits-welcome.png)
+
 **AWS Experience: Beginner**
 
 **Time to Complete: 3-4 hours**
