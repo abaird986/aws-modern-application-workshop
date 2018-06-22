@@ -1,5 +1,7 @@
 # Module 2: Creating a Service with AWS Fargate
 
+![Architecture](/images/module-2/architecture-module-2.png)
+
 **Time to complete:** 60 minutes
 
 **Services used:**
@@ -210,6 +212,9 @@ aws s3 cp ~/environment/aws-modern-application-workshop/module-2/web/index.html 
  Open your website using the same URL used at the end of Module 1 in order to see your new Mythical Mysfits website, which is retrieving JSON data from your Flask API running within a docker container deployed to AWS Fargate!
 
 ### Automating Deployments using AWS Code Services
+
+![Architecture](/images/module-2/architecture-module-2b.png)
+
 
 Now that you have a service up and running, you may think of code changes that you'd like to make to your Flask service.  It would be a bottleneck for your development speed if you had to go through all of the same steps above every time you wanted to deploy a new feature to your service. That's where Continuous Integration and Continuous Delivery or CI/CD come in!
 

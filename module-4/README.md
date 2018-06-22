@@ -1,5 +1,7 @@
 # Module 4: Adding User and API features with Amazon API Gateway and AWS Cognito
 
+![Architecture](/images/module-4/architecture-module-4.png)
+
 **Time to complete:** 60 minutes
 
 **Services used:**

@@ -1,5 +1,7 @@
 # Module 3 - Adding a Data Tier with Amazon DynamoDB
 
+![Architecture](/images/module-3/architecture-module-3.png)
+
 **Time to complete:** 20 minutes
 
 **Services used:**

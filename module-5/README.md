@@ -1,5 +1,7 @@
 # Module 5: Capturing User Behavior
 
+![Architecture](/images/module-5/architecture-module-5.png)
+
 **Time to complete:** 30 minutes
 
 **Services used:**
