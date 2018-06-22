@@ -33,7 +33,7 @@ Before we can create our service, we need to create the core infrastructure envi
 To create these resources, run the following command in the Cloud9 terminal (will take ~10 minutes for stack to be created):
 
 ```
-aws cloudformation create-stack --stack-name MythicalMysfitsCoreStack --capabilities CAPABILITY_IAM --template-body file://~/environment/aws-modern-application-workshop/module-2/cfn/core.yml   
+aws cloudformation create-stack --stack-name MythicalMysfitsCoreStack --capabilities CAPABILITY_NAMED_IAM --template-body file://~/environment/aws-modern-application-workshop/module-2/cfn/core.yml   
 ```
 
 You can check on the status of your stack creation either via the AWS Console or by running the command:
