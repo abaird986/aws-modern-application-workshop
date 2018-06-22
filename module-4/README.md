@@ -19,7 +19,7 @@ To create the **Cognito User Pool** where all of the Mythical Mysfits visitors w
 ```
 aws cognito-idp create-user-pool --pool-name MysfitsUserPool --auto-verified-attributes email
 ```
-Copy the response from the above command, which includes the unique ID for your user pool that you will need to use in later steps. Eg: `Id: us-east-1_ab12345YZ)`
+Copy the response from the above command, which includes the unique ID for your user pool that you will need to use in later steps. Eg: `Id: us-east-1_ab12345YZ`
 
 Next, in order to integrate our frontend website with Cognito, we must create a new **User Pool Client** for this user pool. This generates a unique client identifier that will allow our website to be authorized to call the unauthenticated APIs in cognito where website users can sign-in and register against the Mythical Mysfits user pool.  To create a new client using the AWS CLI for the above user pool, run the following command (replacing the `--user-pool-id` value with the one you copied above):
 
@@ -78,7 +78,7 @@ Copy the response this command returns and save the `id` value for the next step
 Now, our API has been created, but it's yet to be deployed anywhere. To deploy our API, we must first create a deployment and indicate which **stage** the deployment is fore.  A stage is a named reference to a deployment, which is a snapshot of the API. You use a Stage to manage and optimize a particular deployment. For example, you can set up stage settings to enable caching, customize request throttling, configure logging, define stage variables or attach a canary release for testing.  We will call our stage `prod`. To create a deployment for the prod stage, execute the following CLI command:
 
 ```
-aws apigateway create-deployment --rest-api-id wmxn9hti3e --stage-name prod
+aws apigateway create-deployment --rest-api-id REPLACE_ME_WITH_API_ID --stage-name prod
 ```
 
 With that, our REST API that's capable of user Authorization is deployed and available on the Internet... but where?!  Your API is available at the following location:

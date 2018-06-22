@@ -33,7 +33,7 @@ aws codecommit create-repository --repository-name MythicalMysfitsStreamingServi
 ```
 
 In the response to that command, copy the value for `"cloneValueUrl"`.  It should be of the form:
-`https://git-codecommit.region-xyz-1.amazonaws.com/v1/repos/MythicalMysfitsStreamingService-Repository`
+`https://git-codecommit.REPLACE_ME_REGION.amazonaws.com/v1/repos/MythicalMysfitsStreamingService-Repository`
 
 Next, let's clone that new and empty repository into our IDE:
 ```
@@ -41,7 +41,7 @@ cd ~/environment/
 ```
 
 ```
-git clone {insert the copied cloneValueUrl from above}
+git clone REPLACE_ME_WITH_ABOVE_CLONE_URL
 ```
 
 Now, let's move our working directory into this new repository:
@@ -115,7 +115,7 @@ If successful, you will see the newly created `transformed-streaming.yml` file e
 Also returned by the SAM CLI command is the CloudFormation command needed to be executed to create our new full stack.  But because our stack creates IAM resources, you'll need to add one additional parameter to the command.  Execute the following command to deploy the streaming stack:
 
 ```
-aws cloudformation deploy --template-file /home/ec2-user/environment/MythicalMysfitsStreamingService-Repository/cfn/transformed-streaming.yml --stack-name MythicalMysfitsStreamingStack --capabilities CAPABILITY_IAM
+aws cloudformation deploy --template-file /home/ec2-user/environment/MythicalMysfitsStreamingService-Repository/transformed-streaming.yml --stack-name MythicalMysfitsStreamingStack --capabilities CAPABILITY_IAM
 ```
 
 Once this stack creation is complete, the full real-time processing microservice will be created.  
@@ -143,7 +143,8 @@ aws s3 cp ~/environment/aws-modern-application-workshop/module-5/web/index.html 
 
 Refresh your Mythical Mysfits website in the browser once more and you will now have a site that records and publishes each time a user clicks on a mysfits profile!
 
-To view the records that have been processed, they will arrive in the destination S3 bucket created as part of your MythicalMysfitsStreamingStack.  
+To view the records that have been processed, they will arrive in the destination S3 bucket created as part of your MythicalMysfitsStreamingStack.  Visit the S3 console here and explore the bucket you created for the streaming records (it will be prefixed with `mythicalmysfitsstreamings-clicksdestinationbucket`):
+[Amazon S3 Console](https://s3.console.aws.amazon.com/s3/home)
 
 Now that you have a completed modern application architecture, we encourage you now to explore the AWS Console and all the various services you've created to launch Mythical Mysfits!
 
