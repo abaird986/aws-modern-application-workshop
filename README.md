@@ -31,6 +31,7 @@ The Mythical Mysfits website serves it's static content directly from Amazon S3,
 You will be creating and deploying changes to this application completely programmatically. You will use the AWS Command Line Interface to execute commands that create the required infrastructure components, which includes a fully managed CI/CD stack utilizing AWS CodeCommit, CodeBuild, and CodePipeline.  Finally, you will complete the development tasks required all within your own browser by leveraging the cloud-based IDE, AWS Cloud9.
 
 ## Begin the Modern Application Workshop
+
 [Proceed to Module 1](/module-1)
 
 
