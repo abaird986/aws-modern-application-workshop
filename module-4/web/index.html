@@ -238,6 +238,21 @@
           });
           localStorage.setItem('awsConfig', JSON.stringify(AWS.config));
           localStorage.setItem('email', email);
+
+          cognitoUser.getUserAttributes(function(err, result) {
+            if (err) {
+                alert(err);
+                return;
+            }
+            for (i = 0; i < result.length; i++) {
+                console.log('attribute ' + result[i].getName() + ' has value ' + result[i].getValue());
+                if (result[i].getName() == 'sub') {
+                  console.log('Overwriting userId into local storage');
+                  localStorage.setItem('userId', result[i].getValue());
+                }
+            }
+          });
+          
           loggedInDisplay();
         },
 
