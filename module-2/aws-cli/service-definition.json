@@ -14,8 +14,8 @@
         "REPLACE_ME_SG_ID"
       ],
       "subnets": [
-        "REPLACE_ME_PUBLIC_SUBNET_ONE",
-        "REPLACE_ME_PUBLIC_SUBNET_TWO"
+        "REPLACE_ME_PRIVATE_SUBNET_ONE",
+        "REPLACE_ME_PRIVATE_SUBNET_TWO"
       ]
     }
   },

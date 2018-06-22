@@ -62,7 +62,7 @@ cd ~/environment/aws-modern-application-workshop/module-2/app
 * Then build the docker image, this will use the file in the current directory called Dockerfile that tells Docker all of the instructions that should take place when the build command is executed. Replace the contents in and the {braces} below with the appropriate information from the account/region you're working in:
 
 ```
-docker build . -t {aws_account_id}.dkr.ecr.{us-east-1}.amazonaws.com/mythicalmysfits/service:latest
+docker build . -t REPLACE_ME_AWS_ACCOUNT_ID.dkr.ecr.REPLACE_ME_REGION.amazonaws.com/mythicalmysfits/service:latest
 ```
 
 You will see docker download and install all of the necessary dependency packages that our application needs, and output the tag for the built image.  Copy the image tag for later reference.
@@ -93,6 +93,8 @@ This will open another panel in the IDE where the web browser will be available.
 ![preview-menu](/images/module-2/address-bar.png)
 
 If successful you will see a response from the service that returns the JSON document stored at `/aws-modern-application-workshop/module-2/app/service/mysfits-response.json`
+
+When done testing the service you can stop it by pressing CTRL-c on PC or ⌘-c on Mac.
 
 With a successful test of our service locally, we're ready to create a container image repository in Amazon Elastic Container Registry (Amazon ECR) and push our image into it.  In order to create the registry, run the following command, this creates a new repository in the default AWS ECR registry created for your account.
 
@@ -154,7 +156,7 @@ With a new task definition registered, we're ready to provision the infrastructu
 To provision a new NLB, execute the following CLI command in the Cloud9 terminal:
 
 ```
-aws elbv2 create-load-balancer --name mysfits-nlb --scheme internet-facing --type network --subnets subnet-0c7ca350 subnet-1f895078
+aws elbv2 create-load-balancer --name mysfits-nlb --scheme internet-facing --type network --subnets REPLACE_ME_PUBLIC_SUBNET_ONE REPLACE_ME_PUBLIC_SUBNET_TWO
 ```
 
 Copy the response provided by this command, which contains the DNS name of the provisioned NLB as well as its ARN.  You will use this DNS name to test the service once it has been deployed.  And the ARN will be used in a future step.

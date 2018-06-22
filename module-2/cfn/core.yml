@@ -455,12 +455,12 @@ Outputs:
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ExternalUrl' ] ]
   EcsServiceRole:
-    Description: The ARN of the ECS role
+    Description: The ARN of the ECS Service role
     Value: !GetAtt 'EcsServiceRole.Arn'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'EcsServiceRole' ] ]
   ECSTaskRole:
-    Description: The ARN of the ECS role
+    Description: The ARN of the ECS Task role
     Value: !GetAtt 'ECSTaskRole.Arn'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ECSTaskRole' ] ]
