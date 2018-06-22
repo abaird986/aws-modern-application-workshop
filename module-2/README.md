@@ -47,6 +47,8 @@ When in the `describe-stacks` response, you see a status of `CREATE_COMPLETE`, C
 
 Once you see `CREATE_COMPLETE` in the `describe-stacks` response command above, copy the full response and save it for future reference in a text editor. Or, create a temporary folder and file to save it to within your IDE. This JSON response contains the unique identifiers for several of the created resources, which we will use later in this workshop.  
 
+## Module 2a: Creating the Service
+
 ### Creating your First Docker Image
 
 Next, you will create a docker container image that contains all of the code and configuration required to run the Mythical Mysfits backend as a microservice API created with Flask.  We will build the docker container image within Cloud9 and then push it to the Amazon Elastic Container Registry, where it will be available to pull when we create our service using Fargate.
@@ -211,7 +213,7 @@ aws s3 cp ~/environment/aws-modern-application-workshop/module-2/web/index.html 
 
  Open your website using the same URL used at the end of Module 1 in order to see your new Mythical Mysfits website, which is retrieving JSON data from your Flask API running within a docker container deployed to AWS Fargate!
 
-### Automating Deployments using AWS Code Services
+# Module 2b: Automating Deployments using AWS Code Services
 
 ![Architecture](/images/module-2/architecture-module-2b.png)
 
