@@ -213,7 +213,7 @@ aws s3 cp ~/environment/aws-modern-application-workshop/module-2/web/index.html 
 
  Open your website using the same URL used at the end of Module 1 in order to see your new Mythical Mysfits website, which is retrieving JSON data from your Flask API running within a docker container deployed to AWS Fargate!
 
-# Module 2b: Automating Deployments using AWS Code Services
+## Module 2b: Automating Deployments using AWS Code Services
 
 ![Architecture](/images/module-2/architecture-module-2b.png)
 
