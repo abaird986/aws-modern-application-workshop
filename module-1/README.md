@@ -10,9 +10,10 @@
 
 In this module, follow the instructions to create your cloud-based IDE on AWS Cloud9 and deploy the first version of the static Mythical Mysfits website.  Amazon S3 is a highly durable, highly available, and inexpensive object storage service that can serve stored objects directly via HTTP. This makes it wonderfully useful for serving static web content (html, js, css, media content, etc.) directly to web browsers for sites on the Internet.  We will utilize S3 to host the content for our Mythical Mysfits website.
 
-### Select a Region
+### Getting Started
 
-Log in to the AWS Console.
+#### Log In to the AWS Console
+Log in to the AWS Console for the AWS account you will be using in this workshop.
 
 This web application can be deployed in any AWS region that supports all the services used in this application. The supported regions include:
 
@@ -23,7 +24,9 @@ This web application can be deployed in any AWS region that supports all the ser
 
 Select a region from the dropdown in the upper right corner of the AWS Management Console.
 
-### Create a new AWS Cloud9 Environment
+### Creating your Mythical Mysifts IDE
+
+#### Create a new AWS Cloud9 Environment
 
  On the AWS Console home page, type **Cloud9** into the service search bar and select it:
  ![aws-console-home](/images/module-1/cloud9-service.png)
@@ -48,7 +51,9 @@ Click **Create Environment**:
 When the IDE has finished being created for you, you'll be presented with a welcome screen that looks like this:
 ![cloud9-welcome](/images/module-1/cloud9-welcome.png)
 
-In the bottom panel, you will see a terminal command line open and read to use.  Run the following git command in the terminal to clone the necessary code to complete this tutorial:
+#### Cloning the Mythical Mysfits Workshop Repository
+
+In the bottom panel of your new Cloud9 IDE, you will see a terminal command line terminal open and read to use.  Run the following git command in the terminal to clone the necessary code to complete this tutorial:
 
 ```
 git clone https://github.com/aws-samples/aws-modern-application-workshop.git
@@ -64,6 +69,9 @@ In the terminal, change directory to the newly cloned repository directory:
 cd aws-modern-application-workshop
 ```
 
+### Creating a Static Website in Amazon S3
+
+#### Create S3 Bucket and Configure it for Website Hosting
 Next, we will create the infrastructure components needed for hosting a static website in Amazon S3 via the AWS CLI.  
 
 First, create an S3 bucket, replace the name below (mythical-mysfits-bucket-name) with your own unique bucket name.  Copy the name you choose and save it for later, as you will use it in several other places during this workshop:
@@ -78,6 +86,8 @@ Now that we have created a bucket, we need to set some configuration options tha
 aws s3 website s3://REPLACE_ME_BUCKET_NAME --index-document index.html
 ```
 
+#### Update the S3 Bucket Policy
+
 All buckets created in Amazon S3 are fully private by default.  In order to be used as a public website, we need to create an S3 **Bucket Policy** that indicates objects stored within this new bucket may be publicly accessed by anyone. Bucket policies are represented as JSON documents that define the S3 *Actions* (S3 API calls) that are allowed (or not not allowed) to be performed by different *Principals* (in our case the public, or anyone). The JSON document for the necessary bucket policy is located at: `/~/environment/aws-modern-application-workshop/module-1/aws-cli/bucket-policy.json`.  This file includes several places that you need to change to use the new bucket name you've created (indicated with `REPLACE_ME`).
 
 Execute the following CLI command to add a public bucket policy to your website:
@@ -85,6 +95,8 @@ Execute the following CLI command to add a public bucket policy to your website:
 ```
 aws s3api put-bucket-policy --bucket REPLACE_ME_BUCKET_NAME --policy file://~/environment/aws-modern-application-workshop/module-1/aws-cli/website-bucket-policy.json
 ```
+
+#### Publish the Website Content to S3
 
 Now that our new website bucket is configured appropriately, let's add the first iteration of the Mythical Mysfits homepage to the bucket.  Use the following S3 CLI command that mimics the linux command for copying files (**cp**) to copy the provided index.html page locally from your IDE up to the new S3 bucket (replacing the bucket name appropriately).
 
