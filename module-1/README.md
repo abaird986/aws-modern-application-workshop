@@ -12,8 +12,8 @@ In this module, follow the instructions to create your cloud-based IDE on AWS Cl
 
 ### Getting Started
 
-#### Log In to the AWS Console
-Log in to the AWS Console for the AWS account you will be using in this workshop.
+#### Sign In to the AWS Console
+To begin, sign in to the AWS Console for the AWS account you will be using in this workshop.
 
 This web application can be deployed in any AWS region that supports all the services used in this application. The supported regions include:
 
@@ -71,7 +71,7 @@ cd aws-modern-application-workshop
 
 ### Creating a Static Website in Amazon S3
 
-#### Create S3 Bucket and Configure it for Website Hosting
+#### Create an S3 Bucket and Configure it for Website Hosting
 Next, we will create the infrastructure components needed for hosting a static website in Amazon S3 via the AWS CLI.  
 
 First, create an S3 bucket, replace the name below (mythical-mysfits-bucket-name) with your own unique bucket name.  Copy the name you choose and save it for later, as you will use it in several other places during this workshop:
