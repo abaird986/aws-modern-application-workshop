@@ -10,11 +10,11 @@
       "AttributeType": "S"
     },
     {
-      "AttributeName": "Alignment",
+      "AttributeName": "GoodEvil",
       "AttributeType": "S"
     },
     {
-      "AttributeName": "Species",
+      "AttributeName": "LawChaos",
       "AttributeType": "S"
     }
   ],
@@ -26,10 +26,10 @@
   ],
   "GlobalSecondaryIndexes": [
     {
-      "IndexName": "SpeciesIndex",
+      "IndexName": "LawChaosIndex",
       "KeySchema": [
         {
-          "AttributeName": "Species",
+          "AttributeName": "LawChaos",
           "KeyType": "HASH"
         },
         {
@@ -46,10 +46,10 @@
       }
     },
     {
-      "IndexName": "AlignmentIndex",
+      "IndexName": "GoodEvilIndex",
       "KeySchema": [
         {
-          "AttributeName": "Alignment",
+          "AttributeName": "GoodEvil",
           "KeyType": "HASH"
         },
         {

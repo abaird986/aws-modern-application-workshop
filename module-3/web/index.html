@@ -51,9 +51,9 @@
                 <br>
                 Age: {{mysfit.age}}
                 <br>
-                Alignment: {{mysfit.alignment}}
+                Good/Evil: {{mysfit.goodevil}}
                 <br>
-                description: {{mysfit.description}}
+                Lawful/Chaotic: {{mysfit.lawchaos}}
               </p>
           </div>
         </div>
@@ -76,23 +76,24 @@
 
       filterScope = $scope;
 
+      // The possible options for Mysfits to populate the dropdown filters.
       $scope.filterOptionsList =
        {
          "categories": [
            {
-             "title": "Species",
+             "title": "Good/Evil",
              "selections":  [
-               "Dragon",
-               "Griffin",
-               "Direwolf"
+               "Good",
+               "Neutral",
+               "Evil"
              ]
            },
            {
-             "title": "Alignment",
+             "title": "Lawful/Chaotic",
              "selections":  [
-               "Good",
-               "Evil",
-               "Indifferent"
+               "Lawful",
+               "Neutral",
+               "Chaotic"
              ]
            }
          ]
@@ -104,10 +105,10 @@
 
        $scope.queryMysfits = function(filterCategory, filterValue) {
 
-           var petsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategory + "&value=" + filterValue;
+           var mysfitsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategory + "&value=" + filterValue;
 
            $.ajax({
-             url : petsApi,
+             url : mysfitsApi,
              type : 'GET',
              success : function(response) {
                applyGridScope(response.mysfits)
@@ -137,10 +138,10 @@
 
     function getAllMysfits(callback) {
 
-      var petsApi = mysfitsApiEndpoint + '/mysfits';
+      var mysfitsApi = mysfitsApiEndpoint + '/mysfits';
 
       $.ajax({
-        url : petsApi,
+        url : mysfitsApi,
         type : 'GET',
         success : function(response) {
           callback(response.mysfits);

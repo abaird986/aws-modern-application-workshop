@@ -60,9 +60,9 @@
                 <br>
                 Age: {{mysfit.age}}
                 <br>
-                Alignment: {{mysfit.alignment}}
+                Good/Evil: {{mysfit.goodevil}}
                 <br>
-                description: {{mysfit.description}}
+                Lawful/Chaotic: {{mysfit.lawchaos}}
               </p>
           </div>
         </div>
@@ -90,19 +90,19 @@
        {
          "categories": [
            {
-             "title": "Species",
+             "title": "Good/Evil",
              "selections":  [
-               "Dragon",
-               "Griffin",
-               "Direwolf"
+               "Good",
+               "Neutral",
+               "Evil"
              ]
            },
            {
-             "title": "Alignment",
+             "title": "Lawful/Chaotic",
              "selections":  [
-               "Good",
-               "Evil",
-               "Indifferent"
+               "Lawful",
+               "Neutral",
+               "Chaotic"
              ]
            }
          ]
@@ -121,7 +121,13 @@
        */
        $scope.queryMysfits = function(filterCategory, filterValue) {
 
-           var petsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategory + "&value=" + filterValue;
+           var filterCategoryQS = "";
+           if (filterCategory==="Good/Evil") {
+             filterCategoryQS = "GoodEvil";
+           } else {
+             filterCategoryQS = "LawChaos"
+           }
+           var petsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategoryQS + "&value=" + filterValue;
 
            $.ajax({
              url : petsApi,

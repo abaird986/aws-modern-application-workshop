@@ -88,10 +88,12 @@
               <br>
               Species: {{mysfit.species}}
               <br>
-              Alignment: {{mysfit.alignment}}
+              Good/Evil: {{mysfit.goodevil}}
+              <br>
+              Lawful/Chaotic: {{mysfit.lawchaos}}
               <span style="float:right;">
-                <img id="{{mysfit.mysfitId}}LikeIcon" ng-click="likeClicked(mysfit.mysfitId)" src="https://i.imgur.com/4GXfYcg.jpg" onmouseover="" style="cursor: pointer;">
-                <img id="{{mysfit.mysfitId}}AlreadyLikedIcon" class="d-none" src="https://i.imgur.com/nfZ202x.jpg" >
+                <img id="{{mysfit.mysfitId}}LikeIcon" ng-click="likeClicked(mysfit.mysfitId)" src="https://mythicalmysfits.com/images/like_icon_true.png" onmouseover="" style="cursor: pointer;">
+                <img id="{{mysfit.mysfitId}}AlreadyLikedIcon" class="d-none" src="https://mythicalmysfits.com/images/like_icon_false.png" >
               </span>
             </p>
         </div>
@@ -116,7 +118,8 @@
             <br>
             <p id="profileName"> Name: {{profileMysfit.name}}</p>
             <p id="profileSpecies">Species: {{profileMysfit.species}}</p>
-            <p id="profileAlignment">Alignment:{{profileMysfit.alignment}} </p>
+            <p id="profileGoodEvil">Good/Evil:{{profileMysfit.goodevil}} </p>
+            <p id="profileLawChaos">Lawful/Chaotic:{{profileMysfit.lawchaos}} </p>
             <p id="profileAge">Age: {{profileMysfit.age}}</p>
             <p id="profileDescription">Description: {{profileMysfit.description}}</p>
             <p id="profileLikes">Likes: {{profileMysfit.likes}}</p>
@@ -252,7 +255,7 @@
                 }
             }
           });
-          
+
           loggedInDisplay();
         },
 
@@ -318,23 +321,24 @@
 
       filterScope = $scope;
 
+      // The possible options for Mysfits to populate the dropdown filters.
       $scope.filterOptionsList =
        {
          "categories": [
            {
-             "title": "Species",
+             "title": "Good/Evil",
              "selections":  [
-               "Dragon",
-               "Griffin",
-               "Direwolf"
+               "Good",
+               "Neutral",
+               "Evil"
              ]
            },
            {
-             "title": "Alignment",
+             "title": "Lawful/Chaotic",
              "selections":  [
-               "Good",
-               "Evil",
-               "Indifferent"
+               "Lawful",
+               "Neutral",
+               "Chaotic"
              ]
            }
          ]
@@ -346,10 +350,10 @@
 
        $scope.queryMysfits = function(filterCategory, filterValue) {
 
-           var petsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategory + "&value=" + filterValue;
+           var mysfitsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategory + "&value=" + filterValue;
 
            $.ajax({
-             url : petsApi,
+             url : mysfitsApi,
              type : 'GET',
              success : function(response) {
                applyGridScope(response.mysfits)
@@ -445,7 +449,7 @@
 
     function likeMysfit(mysfitId, callback) {
 
-      var petsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId + "/like";
+      var mysfitsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId + "/like";
 
       var sessionTokensString = localStorage.getItem('sessionTokens');
       var sessionTokens = JSON.parse(sessionTokensString);
@@ -453,7 +457,7 @@
       var idJwt = IdToken.jwtToken;
 
       $.ajax({
-        url : petsApi,
+        url : mysfitsApi,
         type : 'POST',
         headers : {'Authorization' : idJwt },
         success : function(response) {
@@ -473,7 +477,7 @@
 
     function adoptMysfit(mysfitId, callback) {
 
-      var petsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId + "/adopt";
+      var mysfitsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId + "/adopt";
 
       var sessionTokensString = localStorage.getItem('sessionTokens');
       var sessionTokens = JSON.parse(sessionTokensString);
@@ -481,7 +485,7 @@
       var idJwt = IdToken.jwtToken;
 
       $.ajax({
-        url : petsApi,
+        url : mysfitsApi,
         async : false,
         type : 'POST',
         headers : {'Authorization' : idJwt },
@@ -500,10 +504,10 @@
 
     function getAllMysfits(callback) {
 
-      var petsApi = mysfitsApiEndpoint + '/mysfits';
+      var mysfitsApi = mysfitsApiEndpoint + '/mysfits';
 
       $.ajax({
-        url : petsApi,
+        url : mysfitsApi,
         type : 'GET',
         success : function(response) {
           callback(response.mysfits);
@@ -519,10 +523,10 @@
 
     function getMysfit(mysfitId, callback) {
 
-      var petsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId;
+      var mysfitsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId;
 
       $.ajax({
-        url : petsApi,
+        url : mysfitsApi,
         type : 'GET',
         success : function(response) {
           callback(response);

@@ -37,7 +37,8 @@ def processRecord(event, context):
         enrichedClick = {
                 'userId': click['userId'],
                 'mysfitId': mysfitId,
-                'alignment': mysfit['alignment'],
+                'goodevil': mysfit['goodevil'],
+                'lawchaos': mysfit['lawchaos'],
                 'species': mysfit['species']
             }
 

@@ -34,7 +34,8 @@ def getAllMysfits():
         mysfit["mysfitId"] = item["MysfitId"]["S"]
         mysfit["name"] = item["Name"]["S"]
         mysfit["age"] = int(item["Age"]["N"])
-        mysfit["alignment"] = item["Alignment"]["S"]
+        mysfit["goodevil"] = item["GoodEvil"]["S"]
+        mysfit["lawchaos"] = item["LawChaos"]["S"]
         mysfit["species"] = item["Species"]["S"]
         mysfit["description"] = item["Description"]["S"]
         mysfit["thumbImageUri"] = item["ThumbImageUri"]["S"]
@@ -73,7 +74,8 @@ def queryMysfits(queryParam):
         mysfit["mysfitId"] = item["MysfitId"]["S"]
         mysfit["name"] = item["Name"]["S"]
         mysfit["age"] = int(item["Age"]["N"])
-        mysfit["alignment"] = item["Alignment"]["S"]
+        mysfit["goodevil"] = item["GoodEvil"]["S"]
+        mysfit["lawchaos"] = item["LawChaos"]["S"]   
         mysfit["species"] = item["Species"]["S"]
         mysfit["description"] = item["Description"]["S"]
         mysfit["thumbImageUri"] = item["ThumbImageUri"]["S"]
