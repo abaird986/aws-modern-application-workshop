@@ -426,11 +426,6 @@ Outputs:
     Value: !Ref AWS::AccountId
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CurrentAccount' ] ]
-  ExternalUrl:
-    Description: The url of the external load balancer
-    Value: !Join ['', ['http://', !GetAtt 'PublicLoadBalancer.DNSName']]
-    Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ExternalUrl' ] ]
   EcsServiceRole:
     Description: The ARN of the ECS Service role
     Value: !GetAtt 'EcsServiceRole.Arn'
