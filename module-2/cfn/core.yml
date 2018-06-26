@@ -426,11 +426,6 @@ Outputs:
     Value: !Ref AWS::AccountId
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CurrentAccount' ] ]
-  PublicLoadBalancer:
-    Description: The arn of the public load balancer
-    Value: !Ref 'PublicLoadBalancer'
-    Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'PublicLoadBalancer' ] ]
   ExternalUrl:
     Description: The url of the external load balancer
     Value: !Join ['', ['http://', !GetAtt 'PublicLoadBalancer.DNSName']]
