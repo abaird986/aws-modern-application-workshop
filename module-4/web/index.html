@@ -86,11 +86,11 @@
             </p>
             <p>
               <br>
-              Species: {{mysfit.species}}
+              <b>Species:</b> {{mysfit.species}}
               <br>
-              Good/Evil: {{mysfit.goodevil}}
+              <b>Good/Evil:</b> {{mysfit.goodevil}}
               <br>
-              Lawful/Chaotic: {{mysfit.lawchaos}}
+              <b>Lawful/Chaotic:</b> {{mysfit.lawchaos}}
               <span style="float:right;">
                 <img id="{{mysfit.mysfitId}}LikeIcon" ng-click="likeClicked(mysfit.mysfitId)" src="https://www.mythicalmysfits.com/images/like_icon_false.png" onmouseover="" style="cursor: pointer;">
                 <img id="{{mysfit.mysfitId}}AlreadyLikedIcon" class="d-none" src="https://www.mythicalmysfits.com/images/like_icon_true.png" >
@@ -116,13 +116,13 @@
               <img id="profileImage" src="{{profileMysfit.profileImageUri}}" align="center" />
             </p>
             <br>
-            <p id="profileName"> Name: {{profileMysfit.name}}</p>
-            <p id="profileSpecies">Species: {{profileMysfit.species}}</p>
-            <p id="profileGoodEvil">Good/Evil:{{profileMysfit.goodevil}} </p>
-            <p id="profileLawChaos">Lawful/Chaotic:{{profileMysfit.lawchaos}} </p>
-            <p id="profileAge">Age: {{profileMysfit.age}}</p>
-            <p id="profileDescription">Description: {{profileMysfit.description}}</p>
-            <p id="profileLikes">Likes: {{profileMysfit.likes}}</p>
+            <p id="profileName"><b>Name:</b> {{profileMysfit.name}}</p>
+            <p id="profileSpecies"><b>Species:</b> {{profileMysfit.species}}</p>
+            <p id="profileGoodEvil"><b>Good/Evil:</b> {{profileMysfit.goodevil}} </p>
+            <p id="profileLawChaos"><b>Lawful/Chaotic:</b> {{profileMysfit.lawchaos}} </p>
+            <p id="profileAge"><b>Age:</b> {{profileMysfit.age}}</p>
+            <p id="profileDescription"><b>Description:</b> {{profileMysfit.description}}</p>
+            <p id="profileLikes"><b>Likes:</b> {{profileMysfit.likes}}</p>
             <p align="center">
               <button id="adoptButton" align="center" type="button" ng-click="adoptClicked(profileMysfit.mysfitId)" class="btn btn-primary">Adopt Me Now!</button>
               <button id="alreadyAdoptedButton" align="center" type="button" class="btn btn-primary d-none" disabled>Mysfit Adopted!</button>
