@@ -124,10 +124,10 @@
            } else {
              filterCategoryQS = "LawChaos"
            }
-           var petsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategoryQS + "&value=" + filterValue;
+           var mysfitsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategoryQS + "&value=" + filterValue;
 
            $.ajax({
-             url : petsApi,
+             url : mysfitsApi,
              type : 'GET',
              success : function(response) {
                applyGridScope(response.mysfits)
@@ -168,10 +168,10 @@
     */
     function getAllMysfits(callback) {
 
-      var petsApi = mysfitsApiEndpoint + '/mysfits';
+      var mysfitsApi = mysfitsApiEndpoint + '/mysfits';
 
       $.ajax({
-        url : petsApi,
+        url : mysfitsApi,
         type : 'GET',
         success : function(response) {
           callback(response.mysfits);

@@ -102,7 +102,13 @@
 
        $scope.queryMysfits = function(filterCategory, filterValue) {
 
-           var mysfitsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategory + "&value=" + filterValue;
+           var filterCategoryQS = "";
+           if (filterCategory==="Good/Evil") {
+             filterCategoryQS = "GoodEvil";
+           } else {
+             filterCategoryQS = "LawChaos"
+           }
+           var mysfitsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategoryQS + "&value=" + filterValue;
 
            $.ajax({
              url : mysfitsApi,
