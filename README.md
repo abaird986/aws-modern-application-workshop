@@ -12,7 +12,7 @@ Is the website done yet? ...It's not??!
 
 Ok fine, we'll stop bothering and leave you to it!  
 
-We'll be back in a few minutes to check on your progress
+We'll be back in a few minutes to check on your progress.
 
 ![mysfits-welcome](/images/module-1/mysfits-welcome.png)
 
