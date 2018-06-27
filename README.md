@@ -1,6 +1,6 @@
 # Build a Modern Application on AWS (Python)
 
-**Mythical Mysfits** is a (fictional) pet adoption startup dedicated to helping abandoned, and often misunderstood, mythical creatures find a new forever family! We at Mythical Mysfits believe that all creatures deserve a second chance, even if they spent their first chance hiding under bridges and unapologetically robbing passersby.
+**Mythical Mysfits** is a (fictional) pet adoption startup dedicated to helping abandoned, and often misunderstood, mythical creatures find a new forever family! Mythical Mysfits believes that all creatures deserve a second chance, even if they spent their first chance hiding under bridges and unapologetically robbing passersby.
 
 You have been hired as the first Full Stack Engineer at Mythical Mysfits, welcome to the team!!
 
