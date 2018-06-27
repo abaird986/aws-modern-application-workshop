@@ -462,56 +462,66 @@
 
     function likeMysfit(mysfitId, callback) {
 
-      var mysfitsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId + "/like";
+      try {
+        var mysfitsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId + "/like";
 
-      var sessionTokensString = localStorage.getItem('sessionTokens');
-      var sessionTokens = JSON.parse(sessionTokensString);
-      var IdToken = sessionTokens.IdToken;
-      var idJwt = IdToken.jwtToken;
+        var sessionTokensString = localStorage.getItem('sessionTokens');
+        var sessionTokens = JSON.parse(sessionTokensString);
+        var IdToken = sessionTokens.IdToken;
+        var idJwt = IdToken.jwtToken;
 
-      $.ajax({
-        url : mysfitsApi,
-        type : 'POST',
-        headers : {'Authorization' : idJwt },
-        success : function(response) {
-          console.log("here" + mysfitId);
-          callback(mysfitId);
-        },
-        error : function(response) {
-          console.log("could not like mysfit");
-          console.log(response);
-          if (response.status == "401") {
-             refreshAWSCredentials();
-           }
-        }
-      });
+        $.ajax({
+          url : mysfitsApi,
+          type : 'POST',
+          headers : {'Authorization' : idJwt },
+          success : function(response) {
+            console.log("here" + mysfitId);
+            callback(mysfitId);
+          },
+          error : function(response) {
+            console.log("could not like mysfit");
+            console.log(response);
+            if (response.status == "401") {
+               refreshAWSCredentials();
+             }
+          }
+        });
+      } catch(err) {
+        alert("You must be logged in to like a mysfit.");
+        console.log(err.message);
+      }
 
     }
 
     function adoptMysfit(mysfitId, callback) {
 
-      var mysfitsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId + "/adopt";
+      try {
+        var mysfitsApi = mysfitsApiEndpoint + '/mysfits/' + mysfitId + "/adopt";
 
-      var sessionTokensString = localStorage.getItem('sessionTokens');
-      var sessionTokens = JSON.parse(sessionTokensString);
-      var IdToken = sessionTokens.IdToken;
-      var idJwt = IdToken.jwtToken;
+        var sessionTokensString = localStorage.getItem('sessionTokens');
+        var sessionTokens = JSON.parse(sessionTokensString);
+        var IdToken = sessionTokens.IdToken;
+        var idJwt = IdToken.jwtToken;
 
-      $.ajax({
-        url : mysfitsApi,
-        async : false,
-        type : 'POST',
-        headers : {'Authorization' : idJwt },
-        success : function(response) {
-          callback();
-        },
-        error : function(response) {
-          console.log("could not adopt mysfit");
-          if (response.status == "401") {
-             refreshAWSCredentials();
-           }
-        }
-      });
+        $.ajax({
+          url : mysfitsApi,
+          async : false,
+          type : 'POST',
+          headers : {'Authorization' : idJwt },
+          success : function(response) {
+            callback();
+          },
+          error : function(response) {
+            console.log("could not adopt mysfit");
+            if (response.status == "401") {
+               refreshAWSCredentials();
+             }
+          }
+        });
+      } catch (err) {
+        alert("You must be logged in to adopt a mysfit.");
+        console.log(err.message);
+      }
 
     }
 
