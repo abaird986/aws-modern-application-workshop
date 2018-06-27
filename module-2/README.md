@@ -274,7 +274,7 @@ In this module, you will create a fully managed CI/CD stack that will automatica
 First, we need to create another S3 bucket that will be used to store the temporary artifacts that are created in the middle of our CI/CD pipeline executions.  Choose a new bucket name for these artifacts and create one using the following CLI command:
 
 ```
-aws s3 mb s3://mythical-mysfits-artifacts-bucket-name
+aws s3 mb s3://REPLACE_ME_CHOOSE_ARTIFACTS_BUCKET_NAME
 ```
 
 Next, this bucket needs a bucket policy to define permissions for the data stored within it. But unlike our website bucket that allowed access to anyone, only our CI/CD pipeline should have access to this bucket.  We have provided the JSON file needed for this policy at `~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json`.  Open this file, and inside you will need to replace several strings to include the ARNs that were created as part of the MythicalMysfitsCoreStack earlier, as well as your newly chosen bucket name for your CI/CD artifacts.
@@ -282,7 +282,7 @@ Next, this bucket needs a bucket policy to define permissions for the data store
 Once you've modified and saved this file, execute the following command to grant access to this bucket to your CI/CD pipeline:
 
 ```
-aws s3api put-bucket-policy --bucket mythical-mysfits-artifacts-bucket-name --policy file://~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json
+aws s3api put-bucket-policy --bucket REPLACE_ME_ARTIFACTS_BUCKET_NAME --policy file://~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json
 ```
 
 #### Create a CodeCommit Repository

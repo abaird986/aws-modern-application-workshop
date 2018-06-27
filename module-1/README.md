@@ -106,7 +106,7 @@ aws s3 cp ~/environment/aws-modern-application-workshop/module-1/web/index.html 
 
 Now, open up your favorite web browser and enter the below into the address bar. The string to replace YOUR_REGION should match whichever region you created, the possible region strings are listed above at the beginning of this modules instructions (eg: us-east-1):
 
-http://YOUR_BUCKET_NAME.s3-website-YOUR_REGION.amazonaws.com
+http://REPLACE_ME_OUR_BUCKET_NAME.s3-website-REPLACE_ME_YOUR_REGION.amazonaws.com
 
 ![mysfits-welcome](/images/module-1/mysfits-welcome.png)
 

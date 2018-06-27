@@ -40,7 +40,7 @@ Next, let's turn our attention to creating a new RESTful API in front of our exi
 Create the VPC Link for our upcoming REST API using the following CLI command (you will need to replace the indicated value with the ARN you saved when the NLB was created in module 2):
 
 ```
-aws apigateway create-vpc-link --name MysfitsApiVpcLink --target-arns REPLACE_ME
+aws apigateway create-vpc-link --name MysfitsApiVpcLink --target-arns REPLACE_ME_NLB_ARN
 ```
 
 The response to the above will indicate that a new VPC link is being provisioned and is in `PENDING` state. Copy the indicated `id` for future use when we create our REST API in the next step.
