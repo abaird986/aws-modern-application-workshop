@@ -1,10 +1,10 @@
 # Build a Modern Application on AWS (Python)
 
-**Mythical Mysfits** is a (fictional) pet adoption non-profit dedicated to helping abandoned, and often misunderstood, mythical creatures find a new forever family! We at Mythical Mysfits believe that all creatures deserve a second chance, even if they spent their first chance hiding under bridges and unapologetically robbing passersby.
+**Mythical Mysfits** is a (fictional) pet adoption startup dedicated to helping abandoned, and often misunderstood, mythical creatures find a new forever family! We at Mythical Mysfits believe that all creatures deserve a second chance, even if they spent their first chance hiding under bridges and unapologetically robbing passersby.
 
 You have been hired as the first Full Stack Engineer at Mythical Mysfits, welcome to the team!!
 
-We, the founders of Mythical Mysfits, need you to complete the first iteration of Mythical Mysfits website.... in the next few hours.  We have a pitch meeting tomorrow morning and need to demo it.  The pitch was super hard to secure and we need a working demo to crush it.  It's with an angel investor that has a soft-spot for fantastical non-profits and she loves our infinite growth potential.  
+We, the founders of Mythical Mysfits, need you to complete the first iteration of Mythical Mysfits website.... in the next few hours.  We have a pitch meeting tomorrow morning and need to demo it.  The pitch was super hard to secure and we need a working demo to crush it.  It's with an angel investor that has a soft-spot for fantastical startups (she owns a designer mysfit - a sasquadoodle), and she loves our infinite growth potential.  
 
 We can't let the pitch fail because of the tech... I mean, the tech is the easy part, right??  
 
