@@ -1,20 +1,14 @@
 # Build a Modern Application on AWS (Python)
 
-**Mythical Mysfits** is a (fictional) pet adoption startup dedicated to helping abandoned, and often misunderstood, mythical creatures find a new forever family! Mythical Mysfits believes that all creatures deserve a second chance, even if they spent their first chance hiding under bridges and unapologetically robbing passersby.
-
-You have been hired as the first Full Stack Engineer at Mythical Mysfits, welcome to the team!!
-
-We, the founders of Mythical Mysfits, need you to complete the first iteration of Mythical Mysfits website.... in the next few hours.  We have a pitch meeting tomorrow morning and need to demo it.  The pitch was super hard to secure and we need a working demo to crush it.  It's with an angel investor that has a soft-spot for fantastical startups (she owns a designer mysfit - a sasquadoodle), and she loves our infinite growth potential.  
-
-We can't let the pitch fail because of the tech... I mean, the tech is the easy part, right??  
-
-Is the website done yet? ...It's not??!
-
-Ok fine, we'll stop bothering and leave you to it!  
-
-We'll be back in a few minutes to check on your progress.
-
 ![mysfits-welcome](/images/module-1/mysfits-welcome.png)
+
+**Mythical Mysfits** is a (fictional) pet adoption non-profit dedicated to helping abandoned, and often misunderstood, mythical creatures find a new forever family! Mythical Mysfits believes that all creatures deserve a second chance, even if they spent their first chance hiding under bridges and unapologetically robbing helpless travelers.
+
+Our business has been thriving with only a single mysfit adoption center, located inside Devils Tower National Monument. Speak, friend, and enter should you ever come to visit.
+
+We've just had a surge of new mysfits arrive at our door with nowhere else to go!  They're all pretty distraught after not only being driven from their homes... but an immensely grumpy ogre has also denied them all entry to into a swamp they've used for refuge in the past.  
+
+That's why we've hired you to be our first Full Stack Engineer. We need a more scalable way to quickly introduce these mysfits to potential adopters. We'd like you to build the first Mythical Mysfits adoption website to help introduce these lovable, magical, often mischievous creatures to the world!
 
 **AWS Experience: Beginner**
 
