@@ -388,7 +388,7 @@ git push
 
 After the change is pushed into the repository, you can open the CodePipeline service in the AWS Console to view your changes as they progress through the CI/CD pipeline. After committing your code change, it will take about 5 to 10 minutes for the changes to be deployed to your live service running in Fargate. Refresh your Mythical Mysfits website in the browser to see that the changes have taken effect.
 
-You can view the progress of your code change through the CodePipeline console here:
+You can view the progress of your code change through the CodePipeline console here (no actions needed, just watch the automation in action!):
 [AWS CodePipeline](https://console.aws.amazon.com/codepipeline/home)
 
 This concludes Module 2.
