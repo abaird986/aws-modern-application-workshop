@@ -44,7 +44,7 @@ You will be creating and deploying changes to this application completely progra
 
 
 ### Workshop Clean-Up (Once Complete)
-Be sure to delete all of the resources created during the workshop in order to ensure that billing for the resources does not continue for longer than you intend.  We reccomend that you utilize the AWS Console to explore the resources you've created and delete them when you're ready.  
+Be sure to delete all of the resources created during the workshop in order to ensure that billing for the resources does not continue for longer than you intend.  We recommend that you utilize the AWS Console to explore the resources you've created and delete them when you're ready.  
 
 For the two cases where you provisioned resources using AWS CloudFormation, you can remove those resources by simply running the following CLI command for each stack:
 
@@ -52,7 +52,7 @@ For the two cases where you provisioned resources using AWS CloudFormation, you 
 aws cloudformation delete-stack --stack-name STACK-NAME-HERE
 ```
 
-To remove all of the created resources, you can visit the following AWS Consoles, which contain resources you've created during the MYthical Mysfits workshop:
+To remove all of the created resources, you can visit the following AWS Consoles, which contain resources you've created during the Mythical Mysfits workshop:
 * [AWS Kinesis](https://console.aws.amazon.com/kinesis/home)
 * [AWS Lambda](https://console.aws.amazon.com/lambda/home)
 * [Amazon S3](https://console.aws.amazon.com/s3/home)
