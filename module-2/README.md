@@ -130,7 +130,7 @@ $(aws ecr get-login --no-include-email)
 Next, push the image you created to the ECR repository using the copied tag from above. Using this command, docker will push your image and all the images it depends on to Amazon ECR:
 
 ```
-docker push 111111111111.dkr.ecr.us-east-1.amazonaws.com/mythicalmysfits/service:latest
+docker push REPLACE_ME_WITH_DOCKER_IMAGE_TAG
 ```
 
 Run the following command to see your newly pushed docker image stored inside the ECR repository:
