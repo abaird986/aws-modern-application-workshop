@@ -156,6 +156,3 @@ Refresh the Mythical Mysfits website in your browser to see the new functionalit
 This concludes Module 4.
 
 [Proceed to Module 5](/module-5)
-
-
-## [AWS Developer Center](https://developer.aws)
