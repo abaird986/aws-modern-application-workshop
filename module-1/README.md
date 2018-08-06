@@ -88,7 +88,7 @@ aws s3 website s3://REPLACE_ME_BUCKET_NAME --index-document index.html
 
 #### Update the S3 Bucket Policy
 
-All buckets created in Amazon S3 are fully private by default.  In order to be used as a public website, we need to create an S3 **Bucket Policy** that indicates objects stored within this new bucket may be publicly accessed by anyone. Bucket policies are represented as JSON documents that define the S3 *Actions* (S3 API calls) that are allowed (or not not allowed) to be performed by different *Principals* (in our case the public, or anyone). The JSON document for the necessary bucket policy is located at: `/~/environment/aws-modern-application-workshop/module-1/aws-cli/bucket-policy.json`.  This file includes several places that you need to change to use the new bucket name you've created (indicated with `REPLACE_ME`).
+All buckets created in Amazon S3 are fully private by default.  In order to be used as a public website, we need to create an S3 **Bucket Policy** that indicates objects stored within this new bucket may be publicly accessed by anyone. Bucket policies are represented as JSON documents that define the S3 *Actions* (S3 API calls) that are allowed (or not not allowed) to be performed by different *Principals* (in our case the public, or anyone). The JSON document for the necessary bucket policy is located at: `~/environment/aws-modern-application-workshop/module-1/aws-cli/bucket-policy.json`.  This file includes several places that you need to change to use the new bucket name you've created (indicated with `REPLACE_ME`).
 
 Execute the following CLI command to add a public bucket policy to your website:
 
@@ -101,12 +101,22 @@ aws s3api put-bucket-policy --bucket REPLACE_ME_BUCKET_NAME --policy file://~/en
 Now that our new website bucket is configured appropriately, let's add the first iteration of the Mythical Mysfits homepage to the bucket.  Use the following S3 CLI command that mimics the linux command for copying files (**cp**) to copy the provided index.html page locally from your IDE up to the new S3 bucket (replacing the bucket name appropriately).
 
 ```
-aws s3 cp ~/environment/aws-modern-application-workshop/module-1/web/index.html s3://YOUR_BUCKET_NAME/index.html
+aws s3 cp ~/environment/aws-modern-application-workshop/module-1/web/index.html s3://REPLACE_ME_BUCKET_NAME/index.html
 ```
 
-Now, open up your favorite web browser and enter the below into the address bar. The string to replace YOUR_REGION should match whichever region you created, the possible region strings are listed above at the beginning of this modules instructions (eg: us-east-1):
+Now, open up your favorite web browser and enter one of the below URIs into the address bar.  One of the below URIs contains a '.' before the region name, and the other a '-'. Which you should use depends on the region you're using. 
 
-http://REPLACE_ME_OUR_BUCKET_NAME.s3-website-REPLACE_ME_YOUR_REGION.amazonaws.com
+The string to replace **REPLACE_ME_YOUR_REGION** should match whichever region you created the S3 bucket within (eg: us-east-1):
+
+For us-east-1 (N. Virginia), us-west-2 (Oregon), eu-west-1 (Ireland) use:
+```
+http://REPLACE_ME_BUCKET_NAME.s3-website-REPLACE_ME_YOUR_REGION.amazonaws.com
+```
+
+For us-east-2 (Ohio) use:
+```
+http://REPLACE_ME_BUCKET_NAME.s3-website.REPLACE_ME_YOUR_REGION.amazonaws.com
+```
 
 ![mysfits-welcome](/images/module-1/mysfits-welcome.png)
 
